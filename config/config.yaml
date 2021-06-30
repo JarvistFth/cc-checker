@@ -1,0 +1,10 @@
+sinks:
+  - package: "github.com/hyperledger/fabric/core/chaincode/shim"
+    method: "PutState"
+    receiver: "shim.ChaincodeStubInterface"
+sources:
+  - package: "math/rand"
+    method: "Int"
+
+  - package: "time"
+    method: "Now"
