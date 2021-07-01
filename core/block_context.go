@@ -4,6 +4,10 @@ import "golang.org/x/tools/go/ssa"
 
 var BlockContexts map[*ssa.BasicBlock]*BlockContext
 
+func init() {
+	BlockContexts = make(map[*ssa.BasicBlock]*BlockContext)
+}
+
 type BlockContext struct {
 	Blk *ssa.BasicBlock
 	In map[ssa.Value]bool
@@ -45,7 +49,7 @@ func (c *BlockContext) ExistedIn(val ssa.Value) bool {
 
 }
 
-func (c *BlockContext) ExsitedOut(val ssa.Value) bool {
+func (c *BlockContext) ExistedOut(val ssa.Value) bool {
 
 	_,ok := c.Out[val]
 	return ok

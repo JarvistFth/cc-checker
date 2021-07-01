@@ -1,0 +1,5 @@
+vendor/
+*.txt
+*.stat
+*.log
+debuglogs/

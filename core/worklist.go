@@ -22,7 +22,7 @@ func NewWorkList() *WorkList {
 	return Worklist
 }
 
-func (l *WorkList) PushBack(vals ...interface{}) {
+func (l *WorkList) PushBack(vals *WorklistNode) {
 	l.list.Append(vals)
 }
 
