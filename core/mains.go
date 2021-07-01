@@ -82,6 +82,7 @@ func bfs(ctx *ValueContext){
 
 func StartAnalysis(fn *ssa.Function) {
 
+
 	valueCtx := &ValueContext{
 		Method:     fn,
 		Callee:     nil,

@@ -62,8 +62,7 @@ func analyzeInBlock(node *WorklistNode){
 				break
 			}
 			newValueCtx := NewValueContext(fn,n.Common())
-			calleenode := NewCallNodes(currentfn)
-			calleenode.AddCallees(newValueCtx)
+
 
 			flowLocalToCalleeParams(newValueCtx,BlockContexts[blk],n)
 
@@ -218,10 +217,13 @@ func analyzeInBlock(node *WorklistNode){
 			//for all edges ⟨X′, c⟩ → X in transitions do
 			//ADD(worklist, ⟨X′, c⟩)
 			//find all call me valuectx with blockctx
-			callnode := CallGraphs[currentCtx.Method]//nil here?
-			callers := callnode.Callers
-			for _,caller := range callers{
-				Worklist.PushBack(NewWorklistNode(caller.ctx,caller.blk))
+			callnodes := CallGraphs.Nodes[currentfn].In//nil here?
+
+
+
+			for _,callnode := range callnodes{
+				BlockContexts[callnode.Site.Block()].
+				Worklist.PushBack(NewWorklistNode(caller.ctx,callnode.Site.Block()))
 			}
 
 

@@ -1,50 +1,38 @@
 package core
 
-import "golang.org/x/tools/go/ssa"
+import (
+	"golang.org/x/tools/go/callgraph"
+	"golang.org/x/tools/go/pointer"
+	"golang.org/x/tools/go/ssa"
+)
 
-var CallGraphs map[*ssa.Function]*CallNodes
+var CallGraphs *callgraph.Graph
 
-func init() {
-	CallGraphs = map[*ssa.Function]*CallNodes{}
+func BuildCallGraph(mainpkg []*ssa.Package) *pointer.Result {
+	cfg := &pointer.Config{
+		Mains:           mainpkg,
+		BuildCallGraph: true,
+	}
+	result,err := pointer.Analyze(cfg)
+
+	if err != nil{
+		log.Errorf(err.Error())
+		return nil
+	}
+	CallGraphs = result.CallGraph
+	return result
 }
 
-type CallNodes struct {
-	Callers []*CallerWithBlock
-	Callees []*ValueContext
-	Me	*ssa.Function
-}
+func GetCallerBlock(cg *callgraph.Graph, fn *ssa.Function) []*ssa.BasicBlock {
+	in := cg.Nodes[fn].In
+	//out := cg.Nodes[fn].Out
 
-func NewCallNodes(me *ssa.Function, ) *CallNodes {
+	var ret []*ssa.BasicBlock
 
-	node := &CallNodes{Me: me}
-	if _,ok := CallGraphs[me]; !ok{
-		CallGraphs[me] = node
+	for _, i := range in{
+		ret = append(ret,i.Site.Block())
 	}
 
+	return ret
 
-
-	return node
 }
-
-func (n *CallNodes) AddCallers(caller ...*CallerWithBlock) {
-	n.Callers = append(n.Callers,caller...)
-}
-
-func (n *CallNodes) AddCallees(callee ...*ValueContext) {
-	n.Callees = append(n.Callees,callee...)
-}
-
-
-
-type CallerWithBlock struct {
-	ctx *ValueContext
-	blk *ssa.BasicBlock
-}
-
-func NewCallValueCtx(context *ValueContext, blk *ssa.BasicBlock) *CallerWithBlock {
-	return &CallerWithBlock{
-		ctx: context,
-		blk: blk,
-	}
-}
-
