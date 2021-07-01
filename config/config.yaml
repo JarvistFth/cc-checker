@@ -8,3 +8,6 @@ sources:
 
   - package: "time"
     method: "Now"
+excludes:
+  - package: "github.com/hyperledger/fabric/core/chaincode/shim"
+    method: "Error"

@@ -12,6 +12,9 @@ var LogFile *os.File
 var debugLogfile *os.File
 var debugstdout = false
 
+func init() {
+	LogFile,_ = os.OpenFile("test-" + time.Now().Format("2006-01-02 15:04:05"+".log"),os.O_APPEND|os.O_WRONLY|os.O_CREATE,0666)
+}
 
 func SetLogger(logName string){
 	now := time.Now().Format("2006-01-02 15:04:05")

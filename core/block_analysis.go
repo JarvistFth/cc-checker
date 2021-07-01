@@ -1,9 +1,7 @@
 package core
 
 import (
-	"cc-checker/config"
 	"cc-checker/logger"
-	"cc-checker/utils"
 	"golang.org/x/tools/go/ssa"
 )
 
@@ -41,59 +39,58 @@ func analyzeInBlock(node *WorklistNode){
 			//check source
 			//check sink
 
-
-
+			_,ok := reportSource(n)
+			if ok{
+				blkctx.AddOut(n.Value())
+				break
+			}
 			reportSink(n)
 
+			isstdcall,_ := checkStdLibCall(n,blkctx)
+			if isstdcall{
+				break
+			}
+
 			fn := extractCallee(n)
+			if fn == nil{
+				break
+			}
 			newValueCtx := NewValueContext(fn,n.Common())
 
 
-			if fn != nil{
+			flowLocalToCalleeParams(newValueCtx,BlockContexts[blk],n)
 
-				flowLocalToCalleeParams(newValueCtx,BlockContexts[blk],n)
+			if existCtx,ok := Contexts[newValueCtx.genKey()];ok{
+				newValueCtx.ExitValue = existCtx.ExitValue
+			}else{
 
-				if existCtx,ok := Contexts[newValueCtx.genKey()];ok{
-					newValueCtx.ExitValue = existCtx.ExitValue
-				}else{
-
-					// else x' not exist, call initContext(x')
-					InitContext(newValueCtx)
-				}
-				// add callgraph me -> callee
-
-
-
-				// if x' exists in contexts
-				// exitvalue := x'.exitValue
-
-
-				// let me.value.tainttag <- flows from exitvalue
-
-				newExitValue := newValueCtx.ExitValue
-				for newExitValue != 0{
-					if (newExitValue & 1) == 1{
-						blkctx.AddOut(n.Value())
-					}
-					newExitValue = newExitValue >> 1
-				}
-
-
-
-
-
-				// normal flow , update in and out
-
-
+				// else x' not exist, call initContext(x')
+				InitContext(newValueCtx)
 			}
+			// add callgraph me -> callee
 
 
+
+			// if x' exists in contexts
+			// exitvalue := x'.exitValue
+
+
+			// let me.value.tainttag <- flows from exitvalue
+
+			newExitValue := newValueCtx.ExitValue
+			for newExitValue != 0{
+				if (newExitValue & 1) == 1{
+					blkctx.AddOut(n.Value())
+				}
+				newExitValue = newExitValue >> 1
+			}
+			// normal flow , update in and out
 
 		case *ssa.Go:
 			// init new ctx
 
 		case *ssa.Field:
-			if blkctx.ExsitedOut(n.X){
+			if blkctx.ExistedOut(n.X){
 				blkctx.AddOut(val)
 			}
 			//
@@ -107,7 +104,7 @@ func analyzeInBlock(node *WorklistNode){
 
 		// Everything but the actual integer Index should be visited.
 
-			if blkctx.ExistedIn(n.X) || blkctx.ExsitedOut(n.X){
+			if blkctx.ExistedIn(n.X) || blkctx.ExistedOut(n.X){
 				blkctx.AddOut(val)
 			}
 
@@ -119,7 +116,7 @@ func analyzeInBlock(node *WorklistNode){
 		// The Value can propagate taint to the Map, but not receive it.
 		// MapUpdate has no referrers, it is only an Instruction, not a Value.
 		case *ssa.MapUpdate:
-			if blkctx.ExistedIn(n.Value) || blkctx.ExsitedOut(n.Value){
+			if blkctx.ExistedIn(n.Value) || blkctx.ExistedOut(n.Value){
 				blkctx.AddOut(n.Map)
 				blkctx.AddOut(n.Key)
 			}
@@ -133,7 +130,7 @@ func analyzeInBlock(node *WorklistNode){
 		// Send has no referrers, it is only an Instruction, not a Value.
 		case *ssa.Send:
 
-			if blkctx.ExistedIn(n.X) || blkctx.ExsitedOut(n.X){
+			if blkctx.ExistedIn(n.X) || blkctx.ExistedOut(n.X){
 				blkctx.AddOut(n.Chan)
 			}
 
@@ -156,7 +153,7 @@ func analyzeInBlock(node *WorklistNode){
 				y = nn.Index
 			}
 
-			if blkctx.ExsitedOut(x) || blkctx.ExsitedOut(y){
+			if blkctx.ExistedOut(x) || blkctx.ExistedOut(y){
 				blkctx.AddOut(val)
 			}
 
@@ -186,7 +183,7 @@ func analyzeInBlock(node *WorklistNode){
 				x = nn.X
 			}
 
-			if blkctx.ExistedIn(x) || blkctx.ExsitedOut(x){
+			if blkctx.ExistedIn(x) || blkctx.ExistedOut(x){
 				blkctx.AddOut(val)
 			}
 		// These nodes don't have operands; they are Values, not Instructions.
@@ -196,7 +193,7 @@ func analyzeInBlock(node *WorklistNode){
 			if _,ok := x.(*ssa.Global);ok{
 				blkctx.AddOut(val)
 			}
-			if blkctx.ExistedIn(x) || blkctx.ExsitedOut(x){
+			if blkctx.ExistedIn(x) || blkctx.ExistedOut(x){
 				blkctx.AddOut(val)
 			}
 
@@ -205,7 +202,7 @@ func analyzeInBlock(node *WorklistNode){
 			tainted := int64(0)
 			rets := n.Results
 			for i, ret := range rets{
-				if blkctx.ExsitedOut(ret) {
+				if blkctx.ExistedOut(ret) {
 					tainted |= 1 << i
 				}
 			}
@@ -233,27 +230,8 @@ func analyzeInBlock(node *WorklistNode){
 	}
 }
 
-func reportSink(call *ssa.Call){
 
-	var path,recv,name string
 
-	if call.Common().IsInvoke(){
-		path,recv,name = utils.DecomposeAbstractMethod(call.Common())
-	}else{
-		if call.Common().StaticCallee() != nil{
-			path,recv,name = utils.DecomposeFunction(call.Common().StaticCallee())
-		}
-
-		if config.IsSink(path,recv,name){
-			//todo: report sink here
-		}
-
-		if config.IsExcluded(path,recv,name){
-			//todo: just return
-			return
-		}
-	}
-}
 
 
 func flowLocalToCalleeParams(newCallValueCtx *ValueContext, blkctx *BlockContext, callinstr ssa.CallInstruction) int64 {

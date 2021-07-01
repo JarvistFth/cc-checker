@@ -120,14 +120,14 @@ func IsSink(path, recv, name string) bool {
 }
 
 
-func IsSource(path, recv, name string) (bool, string) {
+func IsSource(path, recv, name string) (string,bool) {
 
 	for _,s := range SSconfig.Sources{
 		if s.Package == path && s.Receiver == recv && s.Method == name{
-			return true,s.Tag
+			return s.Tag,true
 		}
 	}
-	return false,""
+	return "",false
 }
 
 
