@@ -9,16 +9,24 @@ func init() {
 }
 
 type CallNodes struct {
-	Callers []*CallValueCtx
+	Callers []*CallerWithBlock
 	Callees []*ValueContext
 	Me	*ssa.Function
 }
 
-func NewCallNodes(me *ssa.Function) *CallNodes {
-	return &CallNodes{Me: me}
+func NewCallNodes(me *ssa.Function, ) *CallNodes {
+
+	node := &CallNodes{Me: me}
+	if _,ok := CallGraphs[me]; !ok{
+		CallGraphs[me] = node
+	}
+
+
+
+	return node
 }
 
-func (n *CallNodes) AddCallers(caller ...*CallValueCtx) {
+func (n *CallNodes) AddCallers(caller ...*CallerWithBlock) {
 	n.Callers = append(n.Callers,caller...)
 }
 
@@ -26,14 +34,17 @@ func (n *CallNodes) AddCallees(callee ...*ValueContext) {
 	n.Callees = append(n.Callees,callee...)
 }
 
-type CallValueCtx struct {
+
+
+type CallerWithBlock struct {
 	ctx *ValueContext
 	blk *ssa.BasicBlock
 }
 
-func NewCallValueCtx(context *ValueContext, blk *ssa.BasicBlock) *CallValueCtx {
-	return &CallValueCtx{
+func NewCallValueCtx(context *ValueContext, blk *ssa.BasicBlock) *CallerWithBlock {
+	return &CallerWithBlock{
 		ctx: context,
 		blk: blk,
 	}
 }
+

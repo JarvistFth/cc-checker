@@ -22,6 +22,9 @@ func bfs(ctx *ValueContext){
 
 	var queue []*ssa.BasicBlock
 	blocks := fn.DomPreorder()
+	if len(blocks) == 0{
+		return
+	}
 	log.Infof("bfs:%s ", fn.String())
 	queue = append(queue,blocks[0])
 

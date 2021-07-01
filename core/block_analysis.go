@@ -25,6 +25,7 @@ func analyzeInBlock(node *WorklistNode){
 	blk := node.Blk
 	currentCtx := node.Ctx
 	blkctx := BlockContexts[blk]
+	currentfn := node.Blk.Parent()
 
 
 	for _,instr := range blk.Instrs{
@@ -38,6 +39,11 @@ func analyzeInBlock(node *WorklistNode){
 		case *ssa.Call:
 			//check source
 			//check sink
+
+			//<cuurentCtx,blk> -> callee's fn
+
+
+
 
 			_,ok := reportSource(n)
 			if ok{
@@ -56,7 +62,8 @@ func analyzeInBlock(node *WorklistNode){
 				break
 			}
 			newValueCtx := NewValueContext(fn,n.Common())
-
+			calleenode := NewCallNodes(currentfn)
+			calleenode.AddCallees(newValueCtx)
 
 			flowLocalToCalleeParams(newValueCtx,BlockContexts[blk],n)
 
@@ -211,7 +218,7 @@ func analyzeInBlock(node *WorklistNode){
 			//for all edges ⟨X′, c⟩ → X in transitions do
 			//ADD(worklist, ⟨X′, c⟩)
 			//find all call me valuectx with blockctx
-			callnode := CallGraphs[currentCtx.Method]
+			callnode := CallGraphs[currentCtx.Method]//nil here?
 			callers := callnode.Callers
 			for _,caller := range callers{
 				Worklist.PushBack(NewWorklistNode(caller.ctx,caller.blk))
