@@ -2,6 +2,7 @@ package callgraphs
 
 import (
 	"cc-checker/ssautils"
+	"cc-checker/utils"
 	"testing"
 )
 
@@ -17,12 +18,13 @@ func TestBuildCallGraph	(t *testing.T) {
 	}
 
 	result := BuildCallGraph(mainpkgs)
+	_,invokef := utils.FindInvokeMethod(prog,mainpkgs[0])
 
-	fn := mainpkgs[0].Func("set")
-	if fn != nil{
-		nd := result.CallGraph.Nodes[fn]
+	//fn := mainpkgs[0].Func("set")
+	if invokef != nil{
+		nd := result.CallGraph.Nodes[invokef]
 
-		log.Infof("fn:%s",fn.String())
+		log.Infof("fn:%s",invokef.String())
 
 		for _,edg := range nd.In{
 			log.Infof("%s",prog.Fset.Position(edg.Pos()))
@@ -34,5 +36,10 @@ func TestBuildCallGraph	(t *testing.T) {
 			log.Infof("out:%s",out.Site.Parent().String())
 		}
 	}
+
+}
+
+func TestWhat(t *testing.T) {
+
 
 }

@@ -634,6 +634,7 @@ var FuncSummaries = map[string]Summary{
 	},
 	// func (l *Logger) Writer() io.Writer
 	"(*log.Logger).Writer": fromFirstArgToFirstRet,
+	"(time.Time).Format":fromFirstArgToFirstRet,
 }
 
 // funcKey represents an interface function by its name and its signature.
@@ -742,4 +743,5 @@ var InterfaceFuncSummaries = map[funcKey]Summary{
 		IfTainted:   first,
 		TaintedRets: []int{0},
 	},
+
 }

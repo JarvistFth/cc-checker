@@ -120,3 +120,13 @@ func FindInvokeMethod(prog *ssa.Program, mainPkg *ssa.Package) (*ssa.Function,*s
 	}
 	return initf,invokef
 }
+
+func ReverseNewSlice(s []interface{}) []interface{} {
+	t := make([]interface{},len(s))
+	j := len(s)-1
+	for i,_ := range s{
+		t[i] = s[j]
+		j -= 1
+	}
+	return t
+}

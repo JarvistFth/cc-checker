@@ -13,14 +13,18 @@ func init() {
 	logger.GetLogger()
 }
 
-func TestInitContext(t *testing.T) {
+//func TestInitContext(t *testing.T) {
+//
+//}
+//
+//func TestStartAnalysis(t *testing.T) {
+//	invokef := initial()
+//	StartAnalysis(invokef)
+//
+//}
 
-}
-
-func TestStartAnalysis(t *testing.T) {
-	invokef := initial()
-	StartAnalysis(invokef)
-
+func TestMain(m *testing.M) {
+	Main()
 }
 
 func initial() *ssa.Function {
