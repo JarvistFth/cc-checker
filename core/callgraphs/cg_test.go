@@ -7,7 +7,7 @@ import (
 )
 
 func TestBuildCallGraph	(t *testing.T) {
-	prog, mainpkgs,err := ssautils.BuildSSA("../../ccs/timerandomcc/")
+	prog, mainpkgs,err := ssautils.BuildSSA("../../ccs/voting/")
 	if err != nil{
 		t.Fatalf(err.Error())
 	}
