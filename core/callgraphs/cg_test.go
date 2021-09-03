@@ -35,6 +35,8 @@ func TestBuildCallGraph	(t *testing.T) {
 			log.Infof("%s",prog.Fset.Position(out.Pos()))
 			log.Infof("out:%s",out.Site.String())
 		}
+	}else{
+		log.Infof("invoke func is nil\n")
 	}
 
 }

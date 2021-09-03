@@ -109,7 +109,7 @@ func FindInvokeMethod(prog *ssa.Program, mainPkg *ssa.Package) (*ssa.Function,*s
 		if ty,ok := member.(*ssa.Type); ok{
 			t := ty.Type()
 			p := types.NewPointer(t)
-			initsel := prog.MethodSets.MethodSet(t).Lookup(mainPkg.Pkg,"Invoke")
+			initsel := prog.MethodSets.MethodSet(p).Lookup(mainPkg.Pkg,"Invoke")
 			if initsel == nil {
 				 continue
 			}
