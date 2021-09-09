@@ -22,7 +22,7 @@ import (
 	"strings"
 )
 
-var log = logger.GetLoggerWithSTD()
+var log = logger.GetLogger()
 
 // Dereference returns the underlying type of a pointer.
 // If the input is not a pointer, then the type of the input is returned.
@@ -109,12 +109,16 @@ func FindInvokeMethod(prog *ssa.Program, mainPkg *ssa.Package) (*ssa.Function,*s
 		if ty,ok := member.(*ssa.Type); ok{
 			t := ty.Type()
 			p := types.NewPointer(t)
-			initsel := prog.MethodSets.MethodSet(p).Lookup(mainPkg.Pkg,"Invoke")
-			if initsel == nil {
-				 continue
+			initselt := prog.MethodSets.MethodSet(t).Lookup(mainPkg.Pkg,"Invoke")
+			initselp := prog.MethodSets.MethodSet(p).Lookup(mainPkg.Pkg,"Invoke")
+			if initselt != nil{
+				initf = prog.LookupMethod(t,mainPkg.Pkg,"Init")
+				invokef = prog.LookupMethod(t,mainPkg.Pkg,"Invoke")
 			}
-			initf = prog.LookupMethod(p,mainPkg.Pkg,"Init")
-			invokef = prog.LookupMethod(p,mainPkg.Pkg,"Invoke")
+			if initselp != nil{
+				initf = prog.LookupMethod(p,mainPkg.Pkg,"Init")
+				invokef = prog.LookupMethod(p,mainPkg.Pkg,"Invoke")
+			}
 			if initf == nil || invokef == nil{
 				continue
 			}else {

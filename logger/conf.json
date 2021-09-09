@@ -1,0 +1,14 @@
+{
+  "outputs": [{
+      "output": "console",
+      "level": "INFO",
+      "pattern": "[%{color}%{level:.5s}] %{time:15:04:05} %{shortfile}  %{message}"
+  },
+    {
+      "output": "file",
+      "level": "DEBUG",
+      "pattern": "[%{level:.5s}] %{time:15:04:05} %{shortfile}  %{message}",
+      "name": "cc-checker"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 module cc-checker
 
-go 1.16
+go 1.17
 
 require (
 	github.com/Knetic/govaluate v3.0.0+incompatible // indirect
@@ -16,6 +16,7 @@ require (
 	github.com/onsi/ginkgo v1.14.2 // indirect
 	github.com/onsi/gomega v1.10.4 // indirect
 	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7
+	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/spf13/viper v1.7.1 // indirect
 	github.com/sykesm/zap-logfmt v0.0.4 // indirect
 	go.uber.org/zap v1.16.0 // indirect

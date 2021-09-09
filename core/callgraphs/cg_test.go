@@ -3,6 +3,7 @@ package callgraphs
 import (
 	"cc-checker/ssautils"
 	"cc-checker/utils"
+	"golang.org/x/tools/go/callgraph"
 	"testing"
 )
 
@@ -31,6 +32,13 @@ func TestBuildCallGraph	(t *testing.T) {
 		//	log.Infof(edg.Site.String())
 		//}
 
+		callgraph.GraphVisitEdges(result.CallGraph, func(edge *callgraph.Edge) error {
+
+			
+
+
+		})
+
 		for _, out := range nd.Out{
 			log.Infof("%s",prog.Fset.Position(out.Pos()))
 			log.Infof("out:%s",out.Site.String())
@@ -42,6 +50,5 @@ func TestBuildCallGraph	(t *testing.T) {
 }
 
 func TestWhat(t *testing.T) {
-
 
 }

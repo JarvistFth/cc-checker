@@ -6,7 +6,7 @@ import (
 	"golang.org/x/tools/go/ssa"
 )
 
-var log = logger.GetLoggerWithSTD()
+var log = logger.GetLogger()
 
 func BuildCallGraph(mainpkg []*ssa.Package) *pointer.Result {
 	cfg := &pointer.Config{
@@ -21,4 +21,6 @@ func BuildCallGraph(mainpkg []*ssa.Package) *pointer.Result {
 	}
 
 	return result
+
+
 }

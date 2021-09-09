@@ -8,7 +8,7 @@ import (
 	"golang.org/x/tools/go/ssa/ssautil"
 )
 
-var log = logger.GetLoggerWithSTD()
+var log = logger.GetLogger()
 
 func BuildSSA(path string) (*ssa.Program ,[]*ssa.Package, error){
 	ssacfg := &packages.Config{

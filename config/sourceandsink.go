@@ -8,7 +8,7 @@ import (
 
 
 
-var log = logger.GetLoggerWithSTD()
+var log = logger.GetLogger()
 
 var SSconfig *Config
 

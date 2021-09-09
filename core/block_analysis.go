@@ -5,7 +5,7 @@ import (
 	"golang.org/x/tools/go/ssa"
 )
 
-var log = logger.GetLoggerWithSTD()
+var log = logger.GetLogger()
 
 
 
