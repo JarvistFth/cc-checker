@@ -37,9 +37,9 @@ func TestBuildCallGraph	(t *testing.T) {
 			if edge.Site == nil {
 				log.Infof("%s",edge.String())
 			}else{
-				log.Debugf(edge.Site.String())
-				if strings.Contains(edge.Site.String(),"PutState")  {
-					log.Infof("putState Callee: %s", edge.Caller.String())
+				//log.Debugf(edge.Site.String())
+				if strings.Contains(edge.Callee.String(),"PutState")  {
+					log.Infof("putState Caller: %s", edge.Caller.String())
 				}
 			}
 			return nil
