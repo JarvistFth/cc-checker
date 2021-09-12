@@ -2,6 +2,7 @@ package callgraphs
 
 import (
 	"cc-checker/logger"
+	"go/build"
 	"golang.org/x/tools/go/callgraph"
 	"golang.org/x/tools/go/pointer"
 	"golang.org/x/tools/go/ssa"
@@ -30,3 +31,7 @@ func isSynthetic(edge *callgraph.Edge) bool {
 	return edge.Caller.Func.Pkg == nil || edge.Callee.Func.Synthetic != ""
 }
 
+func inStd(node *callgraph.Node) bool {
+	pkg, _ := build.Import(node.Func.Pkg.Pkg.Path(), "", 0)
+	return pkg.Goroot
+}

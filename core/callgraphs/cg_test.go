@@ -4,6 +4,7 @@ import (
 	"cc-checker/ssautils"
 	"cc-checker/utils"
 	"golang.org/x/tools/go/callgraph"
+	"path/filepath"
 	"testing"
 )
 
@@ -33,32 +34,32 @@ func TestBuildCallGraph	(t *testing.T) {
 		//}
 
 		callgraph.GraphVisitEdges(result.CallGraph, func(edge *callgraph.Edge) error {
-			if isSynthetic(edge){
+
+			caller := edge.Caller
+			callee := edge.Callee
+
+			posCaller := prog.Fset.Position(caller.Func.Pos())
+			//posCallee := prog.Fset.Position(callee.Func.Pos())
+			//posEdge   := prog.Fset.Position(edge.Pos())
+			//fileCaller := fmt.Sprintf("%s:%d", posCaller.Filename, posCaller.Line)
+			filenameCaller := filepath.Base(posCaller.Filename)
+
+			// omit synthetic calls
+			if isSynthetic(edge) {
 				return nil
 			}
-			if edge.Site == nil {
-				//log.Infof("%s",edge.String())
-			}else{
-				//if strings.Contains(edge.Callee.String(),"PutState") || strings.Contains(edge.Caller.String(),"PutState") {
-				//	log.Infof("putState Caller: %s", edge.Caller.String())
-				//	log.Infof("putState Callee: %s", edge.Callee.String())
-				//}
 
-				//if edge.Site != nil && edge.Site.Common().IsInvoke(){
-					//if strings.Contains(edge.Site.Common().Method.String(), "PutState"){
-					//	log.Infof("dynamic call: %s, caller:%s, callee:%s", edge.Site.Common().Method.FullName(),edge.Caller.String(),edge.Callee.String())
-					//}
-					//log.Infof("dynamic call:%s", edge.Site.Common().Method.String())
-				//}
-				//if edge.Site.Common().StaticCallee() == nil{
-				//	log.Infof("dynamic call:%s", edge.Site.String())
-				//}
-				////log.Debugf(edge.Site.String())
-				//if strings.Contains(edge.Callee.String(),"fabric"){
-				//	log.Infof("fabric pkg callee:%s", edge.Callee.String())
-				//}
 
+			// omit std
+			if inStd(caller) || inStd(callee) {
+				return nil
 			}
+
+
+
+			//logf("call node: %s -> %s\n %v", caller, callee, string(data))
+			log.Infof("call node: %s -> %s (%s -> %s) %v\n", caller.Func.Pkg, callee.Func.Pkg, caller, callee, filenameCaller)
+
 
 			return nil
 		})
@@ -73,6 +74,8 @@ func TestBuildCallGraph	(t *testing.T) {
 				}
 			}
 		}
+
+
 	}else{
 		log.Infof("invoke func is nil\n")
 	}
