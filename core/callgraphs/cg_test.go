@@ -46,9 +46,10 @@ func TestBuildCallGraph	(t *testing.T) {
 				}
 
 				if edge.Site != nil && edge.Site.Common().IsInvoke(){
-					if strings.Contains(edge.Site.Common().Method.String(), "PutState"){
-						log.Infof("dynamic call: %s, caller:%s, callee:%s", edge.Site.Common().Method.FullName(),edge.Caller.String(),edge.Callee.String())
-					}
+					//if strings.Contains(edge.Site.Common().Method.String(), "PutState"){
+					//	log.Infof("dynamic call: %s, caller:%s, callee:%s", edge.Site.Common().Method.FullName(),edge.Caller.String(),edge.Callee.String())
+					//}
+					log.Infof("dynamic call:%s", edge.Site.Common().Method.String())
 				}
 				//if edge.Site.Common().StaticCallee() == nil{
 				//	log.Infof("dynamic call:%s", edge.Site.String())
