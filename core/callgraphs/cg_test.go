@@ -34,9 +34,12 @@ func TestBuildCallGraph	(t *testing.T) {
 		//}
 
 		callgraph.GraphVisitEdges(result.CallGraph, func(edge *callgraph.Edge) error {
-
-			if strings.Contains(edge.Site.String(),"PutState")  {
-				log.Infof("putState Callee: %s", edge.Caller.String())
+			if edge.Site == nil {
+				log.Infof("%s",edge.String())
+			}else{
+				if strings.Contains(edge.Site.String(),"PutState")  {
+					log.Infof("putState Callee: %s", edge.Caller.String())
+				}
 			}
 			return nil
 		})
