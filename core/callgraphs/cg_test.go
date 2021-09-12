@@ -4,7 +4,6 @@ import (
 	"cc-checker/ssautils"
 	"cc-checker/utils"
 	"golang.org/x/tools/go/callgraph"
-	"strings"
 	"testing"
 )
 
@@ -24,7 +23,7 @@ func TestBuildCallGraph	(t *testing.T) {
 
 	//fn := mainpkgs[0].Func("set")
 	if invokef != nil{
-		//nd := result.CallGraph.Nodes[invokef]
+		nd := result.CallGraph.Nodes[invokef]
 
 		log.Infof("fn:%s",invokef.String())
 
@@ -40,17 +39,17 @@ func TestBuildCallGraph	(t *testing.T) {
 			if edge.Site == nil {
 				//log.Infof("%s",edge.String())
 			}else{
-				if strings.Contains(edge.Callee.String(),"PutState") || strings.Contains(edge.Caller.String(),"PutState") {
-					log.Infof("putState Caller: %s", edge.Caller.String())
-					log.Infof("putState Callee: %s", edge.Callee.String())
-				}
+				//if strings.Contains(edge.Callee.String(),"PutState") || strings.Contains(edge.Caller.String(),"PutState") {
+				//	log.Infof("putState Caller: %s", edge.Caller.String())
+				//	log.Infof("putState Callee: %s", edge.Callee.String())
+				//}
 
-				if edge.Site != nil && edge.Site.Common().IsInvoke(){
+				//if edge.Site != nil && edge.Site.Common().IsInvoke(){
 					//if strings.Contains(edge.Site.Common().Method.String(), "PutState"){
 					//	log.Infof("dynamic call: %s, caller:%s, callee:%s", edge.Site.Common().Method.FullName(),edge.Caller.String(),edge.Callee.String())
 					//}
-					log.Infof("dynamic call:%s", edge.Site.Common().Method.String())
-				}
+					//log.Infof("dynamic call:%s", edge.Site.Common().Method.String())
+				//}
 				//if edge.Site.Common().StaticCallee() == nil{
 				//	log.Infof("dynamic call:%s", edge.Site.String())
 				//}
@@ -64,10 +63,16 @@ func TestBuildCallGraph	(t *testing.T) {
 			return nil
 		})
 
-		//for _, out := range nd.Out{
-		//	log.Infof("%s",prog.Fset.Position(out.Pos()))
-		//	log.Infof("out:%s",out.Site.String())
-		//}
+		for _, out := range nd.Out{
+			log.Infof("%s",prog.Fset.Position(out.Pos()))
+			if out.Site != nil{
+				log.Infof("out:%s",out.Site.String())
+			}else{
+				if out.Site.Common().IsInvoke(){
+					log.Infof("dynamic call out: %s", out.Site.Common().Method.FullName())
+				}
+			}
+		}
 	}else{
 		log.Infof("invoke func is nil\n")
 	}
