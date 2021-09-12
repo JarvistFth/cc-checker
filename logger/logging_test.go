@@ -5,7 +5,8 @@ import "testing"
 func TestGetLogger(t *testing.T) {
 	log := GetLogger()
 
-
-	log.Debug("test - debug!!")
+	log.Debug("Debug!!")
+	log.Warning("test - debug!!")
 	log.Info("test - INFO!!")
+	log.Error("error")
 }

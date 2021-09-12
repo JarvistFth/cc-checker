@@ -15,7 +15,6 @@ require (
 	github.com/mitchellh/mapstructure v1.4.0 // indirect
 	github.com/onsi/ginkgo v1.14.2 // indirect
 	github.com/onsi/gomega v1.10.4 // indirect
-	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/spf13/viper v1.7.1 // indirect
 	github.com/sykesm/zap-logfmt v0.0.4 // indirect
@@ -25,5 +24,7 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	sigs.k8s.io/yaml v1.2.0
 )
+
+require github.com/JarvistFth/go-logging v0.0.0-20210909153550-7425251a9359 // indirect
 
 replace github.com/hyperledger/fabric => github.com/hyperledger/fabric v1.4.4
