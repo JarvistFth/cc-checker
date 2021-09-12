@@ -2,6 +2,7 @@ package callgraphs
 
 import (
 	"cc-checker/logger"
+	"golang.org/x/tools/go/callgraph"
 	"golang.org/x/tools/go/pointer"
 	"golang.org/x/tools/go/ssa"
 )
@@ -24,3 +25,8 @@ func BuildCallGraph(mainpkg []*ssa.Package) *pointer.Result {
 
 
 }
+
+func isSynthetic(edge *callgraph.Edge) bool {
+	return edge.Caller.Func.Pkg == nil || edge.Callee.Func.Synthetic != ""
+}
+

@@ -34,6 +34,9 @@ func TestBuildCallGraph	(t *testing.T) {
 		//}
 
 		callgraph.GraphVisitEdges(result.CallGraph, func(edge *callgraph.Edge) error {
+			if isSynthetic(edge){
+				return nil
+			}
 			if edge.Site == nil {
 				//log.Infof("%s",edge.String())
 			}else{
