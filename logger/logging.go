@@ -5,6 +5,8 @@ import (
 	"github.com/JarvistFth/go-logging"
 	"io/ioutil"
 	"os"
+	"path/filepath"
+	"runtime"
 	"time"
 )
 
@@ -25,14 +27,17 @@ type LoggerConfig struct {
 
 //
 func init() {
-	cfg := readConfig()
-	setupLogger(cfg)
+	//cfg := readConfig()
+	//setupLogger(cfg)
 }
 
 func readConfig() LoggerConfig {
-	content,err := ioutil.ReadFile("./conf.json")
+	_,f,_,_ := runtime.Caller(0)
+	f = filepath.Join(filepath.Dir(f),"conf.json")
+	//os.Stdout.WriteString(f)
+	content,err := ioutil.ReadFile(f)
 	if err != nil{
-		panic("read logger json config error!")
+		panic(err.Error())
 	}
 	var cfg LoggerConfig
 	err = json.Unmarshal(content,&cfg)
