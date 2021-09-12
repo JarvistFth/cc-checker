@@ -24,7 +24,7 @@ func TestBuildCallGraph	(t *testing.T) {
 
 	//fn := mainpkgs[0].Func("set")
 	if invokef != nil{
-		nd := result.CallGraph.Nodes[invokef]
+		//nd := result.CallGraph.Nodes[invokef]
 
 		log.Infof("fn:%s",invokef.String())
 
@@ -37,6 +37,7 @@ func TestBuildCallGraph	(t *testing.T) {
 			if edge.Site == nil {
 				log.Infof("%s",edge.String())
 			}else{
+				log.Debugf(edge.Site.String())
 				if strings.Contains(edge.Site.String(),"PutState")  {
 					log.Infof("putState Callee: %s", edge.Caller.String())
 				}
@@ -44,10 +45,10 @@ func TestBuildCallGraph	(t *testing.T) {
 			return nil
 		})
 
-		for _, out := range nd.Out{
-			log.Infof("%s",prog.Fset.Position(out.Pos()))
-			log.Infof("out:%s",out.Site.String())
-		}
+		//for _, out := range nd.Out{
+		//	log.Infof("%s",prog.Fset.Position(out.Pos()))
+		//	log.Infof("out:%s",out.Site.String())
+		//}
 	}else{
 		log.Infof("invoke func is nil\n")
 	}
