@@ -9,7 +9,7 @@ import (
 )
 
 func TestBuildCallGraph	(t *testing.T) {
-	prog, mainpkgs,err := ssautils.BuildSSA("../../ccs/voting/")
+	prog, mainpkgs,err := ssautils.BuildSSA("../../ccs/timerandomcc/")
 	if err != nil{
 		t.Fatalf(err.Error())
 	}
@@ -37,7 +37,11 @@ func TestBuildCallGraph	(t *testing.T) {
 			if edge.Site == nil {
 				log.Infof("%s",edge.String())
 			}else{
+
 				//log.Debugf(edge.Site.String())
+				if strings.Contains(edge.Callee.String(),"fabric"){
+					log.Infof("fabric pkg callee:%s", edge.Callee.String())
+				}
 				if strings.Contains(edge.Callee.String(),"PutState")  {
 					log.Infof("putState Caller: %s", edge.Caller.String())
 				}
