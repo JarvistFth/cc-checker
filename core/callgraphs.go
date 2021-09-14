@@ -13,8 +13,8 @@ func BuildCallGraph(mainpkg []*ssa.Package) *pointer.Result {
 		Mains:           mainpkg,
 		BuildCallGraph: true,
 	}
-	result,err := pointer.Analyze(cfg)
 
+	result,err := pointer.Analyze(cfg)
 	if err != nil{
 		log.Errorf(err.Error())
 		return nil

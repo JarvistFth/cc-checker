@@ -83,7 +83,6 @@ func (c *CallContext) Initialize() {
 
 				//check stdlib call
 			case *ssa.Return:
-				c.exit[]
 
 			}
 
