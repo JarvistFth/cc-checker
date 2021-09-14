@@ -87,69 +87,6 @@ func TestBuildCallGraph	(t *testing.T) {
 	if invokef != nil{
 		nd := result.CallGraph.Nodes[invokef]
 
-		//for i:=0 ;i<invokef.Signature.Params().Len(); i++{
-		//	param := invokef.Signature.Params().At(0)
-		//	if strings.Contains(param.Type().String(),"ChaincodeStubInterface"){
-		//		t := param.Type()
-		//		mset := prog.MethodSets.MethodSet(t)
-		//		fn := prog.LookupMethod(t,param.Pkg(),"PutState")
-		//		if fn != nil{
-		//			log.Infof("putstate fn: %s", fn.String())
-		//		}
-		//		log.Infof("mset: %s", mset.String())
-		//		//if _,ok := t.(*types.Interface); ok{
-		//		//
-		//		//}else{
-		//		//	log.Warning("not interface type")
-		//		//}
-		//		//putstatefn = utils.FindMethodByType(prog,mainpkgs[0],ti,"PutState")
-		//	}
-		//}
-
-		//invokef.WriteTo(os.Stdout)
-		//log.Infof("fn:%s",invokef.String())
-		//pnode := result.CallGraph.Nodes[putstatefn]
-
-		//for callee,_:= range callees{
-		//	log.Infof("putstate callee: %s, %v", callee.Func.String(), prog.Fset.Position(callee.Func.Pos()))
-		//}
-
-		//for _,edg := range nd.In{
-		//	log.Infof("%s",prog.Fset.Position(edg.Pos()))
-		//	log.Infof(edg.Site.String())
-		//}
-		//callgraph.GraphVisitEdges(result.CallGraph, func(edge *callgraph.Edge) error {
-		////
-		//	caller := edge.Caller
-		//	calli := edge.Site
-		//	callee := edge.Callee
-		////
-		////	//posCaller := prog.Fset.Position(caller.Func.Pos())
-		////	//posCallee := prog.Fset.Position(callee.Func.Pos())
-		////	//posEdge   := prog.Fset.Position(edge.Pos())
-		////	//fileCaller := fmt.Sprintf("%s:%d", posCaller.Filename, posCaller.Line)
-		////	//filenameCaller := filepath.Base(posCaller.Filename)
-		////
-		////	// omit synthetic calls
-		//	if isSynthetic(edge) {
-		//		return nil
-		//	}
-		//	if inStd(caller) || inStd(callee) {
-		//		return nil
-		//	}
-		//	if calli != nil{
-		//		if calli.Common().IsInvoke(){
-		//			interfaceTypeName := calli.Common().Value.Type().String()
-		//			methodName := calli.Common().Method.Name()
-		//			if strings.Contains(interfaceTypeName, "ChaincodeStubInterface") && strings.Contains(methodName, "PutState"){
-		//				log.Infof("dynamic call putState: %s", calli.Common().Method.FullName())
-		//				putstatefn = callee.Func
-		//
-		//			}
-		//		}
-		//	}
-		//	return nil
-		//})
 		var putstatefn *ssa.Function
 		for _, out := range nd.Out{
 
