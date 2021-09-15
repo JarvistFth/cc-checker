@@ -6,7 +6,6 @@ import (
 	ssautils "cc-checker/ssautils"
 	"cc-checker/utils"
 	"golang.org/x/tools/go/ssa"
-	"testing"
 )
 
 func init() {
@@ -22,10 +21,6 @@ func init() {
 //	StartAnalysis(invokef)
 //
 //}
-
-func TestMain(m *testing.M) {
-	Main()
-}
 
 func initial() *ssa.Function {
 	cfg,err := config.ReadConfig("../config/config.yaml")

@@ -6,7 +6,6 @@ import (
 	"cc-checker/utils"
 	"golang.org/x/tools/go/callgraph"
 	"golang.org/x/tools/go/ssa"
-	"golang.org/x/tools/go/ssa/ssautil"
 )
 
 var prog *ssa.Program
@@ -39,7 +38,7 @@ func Main(){
 
 func StartAnalysis(fn *ssa.Function) {
 
-	if fn == nil{
+	if fn == nil {
 
 		return
 	}
@@ -48,23 +47,11 @@ func StartAnalysis(fn *ssa.Function) {
 
 	var outputNodes []*callgraph.Node
 
-	for _,outputEdge := range outputEdges{
+	for _, outputEdge := range outputEdges {
 		//check source
-		outputNodes = append(outputNodes,outputEdge.Caller)
+		outputNodes = append(outputNodes, outputEdge.Caller)
 
 	}
-
-	ssautil.AllFunctions()
-
-
-
-	for len(outputNodes) > 0{
-		front := outputNodes[0]
-		outputNodes = outputNodes[1:]
-
-		//
-	}
-
 
 
 

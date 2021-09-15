@@ -1,6 +1,7 @@
 package core
 
 import (
+	"cc-checker/utils"
 	"golang.org/x/tools/go/callgraph"
 )
 
@@ -16,16 +17,21 @@ func NewVisitor() *visitor {
 
 func (v *visitor) Visit(node *callgraph.Node) {
 	if !v.seen[node]{
+		log.Infof("traverse visit: %s", node.String())
 		v.seen[node] = true
 
-		log.Infof("traverse visit: %s", node.String())
 		//check source
 
 		//check sink
 
 
 		for _,outputEdge := range node.Out{
-			v.Visit(outputEdge.Caller)
+			if utils.IsSynthetic(outputEdge) || utils.InStd(outputEdge.Callee) || utils.InFabric(outputEdge.Callee){
+				v.seen[outputEdge.Callee] = true
+				continue
+			}
+			log.Infof("out: %s", outputEdge.Callee.String())
+			v.Visit(outputEdge.Callee)
 		}
 
 	}

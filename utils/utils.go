@@ -17,7 +17,9 @@ package utils
 
 import (
 	"cc-checker/logger"
+	"go/build"
 	"go/types"
+	"golang.org/x/tools/go/callgraph"
 	"golang.org/x/tools/go/ssa"
 	"strings"
 )
@@ -199,4 +201,17 @@ func ReverseNewSlice(s []interface{}) []interface{} {
 		j -= 1
 	}
 	return t
+}
+
+func IsSynthetic(edge *callgraph.Edge) bool {
+	return edge.Caller.Func.Pkg == nil || edge.Callee.Func.Synthetic != ""
+}
+
+func InStd(node *callgraph.Node) bool {
+	pkg, _ := build.Import(node.Func.Pkg.Pkg.Path(), "", 0)
+	return pkg.Goroot
+}
+
+func InFabric(node *callgraph.Node) bool {
+	return strings.Contains(node.Func.Pkg.Pkg.Path(), "fabric")
 }

@@ -7,7 +7,7 @@ import (
 )
 
 func TestVisitor_Visit(t *testing.T) {
-	prog, allpkgs,err := ssautils.BuildSSA("../../ccs/timerandomcc/")
+	prog, allpkgs,err := ssautils.BuildSSA("../ccs/timerandomcc/")
 	mainpkgs,err := ssautils.MainPackages(allpkgs)
 	if err != nil{
 		t.Fatalf(err.Error())
@@ -26,7 +26,8 @@ func TestVisitor_Visit(t *testing.T) {
 		nd := result.CallGraph.Nodes[invokef]
 		v := NewVisitor()
 		for _, out := range nd.Out{
-			v.Visit(out.Caller)
+			log.Infof("invoke out:%s", out.Callee.String())
+			v.Visit(out.Callee)
 		}
 	}else{
 		log.Infof("invoke func is nil\n")
