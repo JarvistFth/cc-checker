@@ -27,6 +27,7 @@ require (
 )
 
 require (
+	github.com/emirpasic/gods v1.12.0 // indirect
 	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7 // indirect
 	golang.org/x/tools v0.1.5
 )

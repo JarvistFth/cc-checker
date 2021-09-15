@@ -2,6 +2,8 @@ package config
 
 import (
 	"cc-checker/logger"
+	"cc-checker/utils"
+	"golang.org/x/tools/go/ssa"
 	"io/ioutil"
 	"sigs.k8s.io/yaml"
 )
@@ -110,23 +112,57 @@ func IsExcluded(path, recv, name string) bool {
 }
 
 // IsSink determines whether a function is a sink.
-func IsSink(path, recv, name string) bool {
-	for _,s := range SSconfig.Sinks{
-		if s.Package == path && s.Receiver == recv && s.Method == name{
-			return true
+func IsSink(call ssa.CallInstruction) bool {
+	callcom := call.Common()
+
+	if fn := callcom.StaticCallee(); fn != nil{
+		path,recv,name := utils.DecomposeFunction(fn)
+		for _,s := range SSconfig.Sinks{
+			if s.Package == path && s.Receiver == recv && s.Method == name{
+				return true
+			}
+		}
+	}else{
+		//invoke mode
+		if callcom.IsInvoke(){
+			path,recv,name := utils.DecomposeAbstractMethod(callcom)
+			for _,s := range SSconfig.Sinks{
+				if s.Package == path && s.Receiver == recv && s.Method == name{
+					return true
+				}
+			}
+		}else{
+			//dynamic call mode
 		}
 	}
 	return false
 }
 
 
-func IsSource(path, recv, name string) (string,bool) {
+func IsSource(call ssa.CallInstruction) (string,bool) {
+	callcom := call.Common()
 
-	for _,s := range SSconfig.Sources{
-		if s.Package == path && s.Receiver == recv && s.Method == name{
-			return s.Tag,true
+	if fn := callcom.StaticCallee(); fn != nil{
+		path,recv,name := utils.DecomposeFunction(fn)
+		for _,s := range SSconfig.Sources{
+			if s.Package == path && s.Receiver == recv && s.Method == name{
+				return s.Tag,true
+			}
+		}
+	}else{
+		//invoke mode
+		if callcom.IsInvoke(){
+			path,recv,name := utils.DecomposeAbstractMethod(callcom)
+			for _,s := range SSconfig.Sources{
+				if s.Package == path && s.Receiver == recv && s.Method == name{
+					return s.Tag,true
+				}
+			}
+		}else{
+			//dynamic call mode
 		}
 	}
+
 	return "",false
 }
 

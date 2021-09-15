@@ -3,6 +3,8 @@ package core
 import (
 	"cc-checker/ssautils"
 	"cc-checker/utils"
+	"golang.org/x/tools/go/callgraph"
+	"sync"
 	"testing"
 )
 
@@ -22,14 +24,25 @@ func TestVisitor_Visit(t *testing.T) {
 	_,invokef := utils.FindInvokeMethod(prog,mainpkgs[0])
 	//var putstatefn *ssa.Function
 	//fn := mainpkgs[0].Func("set")
+	var wg sync.WaitGroup
+	defer wg.Wait()
 	if invokef != nil{
 		nd := result.CallGraph.Nodes[invokef]
-		v := NewVisitor()
 		for _, out := range nd.Out{
-			log.Infof("invoke out:%s", out.Callee.String())
-			v.Visit(out.Callee)
+			go func(out *callgraph.Edge) {
+				wg.Add(1)
+				v := NewVisitor()
+				log.Infof("invoke out:%s", out.Callee.String())
+				v.Visit(out.Callee)
+				wg.Done()
+			}(out)
+
 		}
 	}else{
 		log.Infof("invoke func is nil\n")
 	}
+
+
 }
+
+
