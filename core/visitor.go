@@ -36,7 +36,7 @@ func (v *visitor) Visit(node *callgraph.Node) {
 
 		v.loopFunction(node.Func)
 
-		v.handleReturnValue()
+		v.handleReturnValue(node)
 
 		v.handleSinkDetection()
 
@@ -98,22 +98,35 @@ func (v *visitor) checkSink(call ssa.CallInstruction) {
 
 
 
-func(v *visitor) taintReferrers(node *callgraph.Node) {
-
-	for val,m := range v.lattice{
-		if val.Parent() != nil && val.Parent() == node.Func{
-			for _,ref := range *val.Referrers(){
-				if refval,ok := ref.(ssa.Value);ok{
-					for tag,_ := range m{
-						v.taintVal(refval,tag)
-					}
-				}
-			}
-		}
-
+func(v *visitor) taintReferrers(val ssa.Value) {
+	if _,found := v.lattice[val]; found{
+		return
 	}
 
+	if val.Referrers() == nil{
+		return
+	}
 
+	for _, r := range *val.Referrers(){
+		if rval,ok := r.(ssa.Value); ok{
+
+		}
+	}
+
+	if val.Referrers() != nil{
+		for _,ref := range *val.Referrers(){
+			if refval,ok := ref.(ssa.Value);ok{
+				m,ok := v.lattice[val]
+				if !ok{
+					continue
+				}
+				for tag,_ := range m{
+					v.taintVal(refval,tag)
+				}
+				v.taintReferrers(refval)
+			}
+		}
+	}
 
 }
 
@@ -165,7 +178,10 @@ func (v *visitor) handleReturnValue(node *callgraph.Node) {
 		 inEdges := node.In
 
 		 for _,inEdge := range inEdges{
-			 inEdge.Caller
+		 	value := inEdge.Site.Value().Call.Value
+
+		 	v.taintVal(value,tags)
+		 	v.taintReferrers(value)
 		 }
 
 	 }
