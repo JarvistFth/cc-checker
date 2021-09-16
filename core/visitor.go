@@ -11,12 +11,19 @@ type visitor struct {
 
 	lattice map[ssa.Value]map[string]bool
 	seen map[*callgraph.Node]bool
+	sinks map[ssa.CallInstruction]bool
+	sinkArgs map[ssa.Value]bool
+
+	returnInstr map[*ssa.Function]*ssa.Return
 }
 
 func NewVisitor() *visitor {
 	return &visitor{
 		seen: make(map[*callgraph.Node]bool),
 		lattice: make(map[ssa.Value]map[string]bool),
+
+		
+		returnInstr: make(map[*ssa.Function]*ssa.Return),
 	}
 }
 
@@ -27,9 +34,11 @@ func (v *visitor) Visit(node *callgraph.Node) {
 
 		//check source
 
-		v.taintReferrers(node)
+		v.loopFunction(node.Func)
 
-		//check sink
+		v.handleReturnValue()
+
+		v.handleSinkDetection()
 
 
 		for _,outputEdge := range node.Out{
@@ -46,41 +55,63 @@ func (v *visitor) Visit(node *callgraph.Node) {
 	}
 }
 
-func(v *visitor) taintReferrers(node *callgraph.Node) {
-
-	fn := node.Func
-
-	// if is source:
+func (v *visitor) loopFunction(fn *ssa.Function) {
+	if fn == nil{
+		log.Errorf("fn == nil!")
+		return
+	}
 	for _,block := range fn.Blocks{
 		for _,instr := range block.Instrs{
-			if call,ok := instr.(ssa.CallInstruction);ok{
-				tag,yes := config.IsSource(call)
-				if yes{
-					callValue := call.Value()
-					var buf [10]*ssa.Value // avoid alloc in common case
-					if callValue.Referrers() != nil{
-						for _,referer := range *callValue.Referrers(){
-							if refCall,ok := referer.(ssa.CallInstruction); ok{
-								ops := refCall.Value().Operands(buf[:])
-								for _,op := range ops{
-									if op != nil{
-										log.Infof("op: %s", (*op).String())
-									}
-								}
+			if ret,ok := instr.(*ssa.Return); ok {
+				v.returnInstr[fn] = ret
+				continue
+			}
 
-								continue
-							}
-							if val,ok := referer.(ssa.Value);ok{
-								v.taintVal(val,tag)
-							}
-						}
-					}
-				}
+
+			if call,ok := instr.(ssa.CallInstruction); ok	{
+				v.checkSource(call)
+
+				v.checkSink(call)
 			}
 		}
 	}
 
-	// taint referers
+}
+
+
+// check source :
+// if isSource, put call.value into taintSet
+func (v *visitor) checkSource(call ssa.CallInstruction) {
+	if tag,yes := config.IsSource(call); yes{
+		v.taintVal(call.Common().Value,tag)
+	}
+}
+
+func (v *visitor) checkSink(call ssa.CallInstruction) {
+	if ok := config.IsSink(call); ok {
+		v.sinks[call] = true
+		for _,arg := range call.Value().Call.Args{
+			v.sinkArgs[arg] = true
+		}
+	}
+}
+
+
+
+func(v *visitor) taintReferrers(node *callgraph.Node) {
+
+	for val,m := range v.lattice{
+		if val.Parent() != nil && val.Parent() == node.Func{
+			for _,ref := range *val.Referrers(){
+				if refval,ok := ref.(ssa.Value);ok{
+					for tag,_ := range m{
+						v.taintVal(refval,tag)
+					}
+				}
+			}
+		}
+
+	}
 
 
 
@@ -101,6 +132,43 @@ func (v *visitor) taintVal(val ssa.Value, tag string) {
 
 }
 
-func (v *visitor) taintCallArgs() {
+func (v *visitor) handleSinkDetection() bool {
+	for arg,_ := range v.sinkArgs{
+		if m,ok := v.lattice[arg];ok{
 
+			//report detection
+			var sinkTag string
+			for tag, _ := range m{
+				sinkTag += tag + " "
+			}
+			log.Warning("sink here %sinkTag with tag:%sinkTag", prog.Fset.Position(arg.Pos()), sinkTag)
+			return true
+		}
+	}
+	return false
 }
+
+func (v *visitor) handleReturnValue(node *callgraph.Node) {
+	 ret,ok := v.returnInstr[node.Func]
+	 if ok{
+		 returnValues := ret.Results
+		 var tags string
+
+		 for _,result := range returnValues{
+			 if m,ok := v.lattice[result]; ok{
+				 for tag,_ := range m{
+					 tags += tag + " "
+				 }
+			 }
+		 }
+
+		 inEdges := node.In
+
+		 for _,inEdge := range inEdges{
+			 inEdge.Caller
+		 }
+
+	 }
+}
+
+
