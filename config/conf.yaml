@@ -5,9 +5,11 @@ sinks:
 sources:
   - package: "math/rand"
     method: "Int"
+    tag: "random"
 
   - package: "time"
     method: "Now"
+    tag: "time"
 excludes:
   - package: "github.com/hyperledger/fabric/core/chaincode/shim"
     method: "Error"

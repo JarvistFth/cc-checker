@@ -12,10 +12,8 @@ import (
 
 var Logger *logging.Logger
 var LogFile *os.File
-var debugLogfile *os.File
-var debugstdout = false
 
-type LoggerConfig struct {
+type loggerConfig struct {
 	Outputs []struct {
 		Output  string `json:"output"`
 		Level   string `json:"level"`
@@ -24,48 +22,47 @@ type LoggerConfig struct {
 	} `json:"outputs"`
 }
 
-
 //
 func init() {
-	//cfg := readConfig()
-	//setupLogger(cfg)
+	cfg := readConfig()
+	setupLogger(cfg)
 }
 
-func readConfig() LoggerConfig {
-	_,f,_,_ := runtime.Caller(0)
-	f = filepath.Join(filepath.Dir(f),"conf.json")
+func readConfig() loggerConfig {
+	_, f, _, _ := runtime.Caller(0)
+	f = filepath.Join(filepath.Dir(f), "conf.json")
 	//os.Stdout.WriteString(f)
-	content,err := ioutil.ReadFile(f)
-	if err != nil{
+	content, err := ioutil.ReadFile(f)
+	if err != nil {
 		panic(err.Error())
 	}
-	var cfg LoggerConfig
-	err = json.Unmarshal(content,&cfg)
-	if err != nil{
+	var cfg loggerConfig
+	err = json.Unmarshal(content, &cfg)
+	if err != nil {
 		panic("unmarshal json config error")
 	}
 	return cfg
 }
 
-func setupLogger(cfg LoggerConfig){
+func setupLogger(cfg loggerConfig) {
 	Logger = logging.MustGetLogger("main")
 	var backends []logging.Backend
-	for _,output := range cfg.Outputs{
+	for _, output := range cfg.Outputs {
 		var logBackends *logging.LogBackend
 		var format logging.Formatter
 		switch output.Output {
 		case "console":
-			logBackends = logging.NewLogBackend(os.Stdout,"",0)
+			logBackends = logging.NewLogBackend(os.Stdout, "", 0)
 			format = logging.MustStringFormatter(output.Pattern)
 		case "file":
-			LogFile,_ := os.OpenFile(output.Name+"-"+time.Now().Format("2006-01-02-15:04:05")+".log",os.O_APPEND|os.O_WRONLY|os.O_CREATE,0666)
-			logBackends = logging.NewLogBackend(LogFile,"",0)
+			LogFile, _ = os.OpenFile(output.Name+"-"+time.Now().Format("2006-01-02-15:04:05")+".log", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0666)
+			logBackends = logging.NewLogBackend(LogFile, "", 0)
 			format = logging.MustStringFormatter(output.Pattern)
 		}
 
-		backend := logging.AddModuleLevel(logging.NewBackendFormatter(logBackends,format))
-		backend.SetLevel(mapLevel(output.Level),"INFO")
-		backends = append(backends,backend)
+		backend := logging.AddModuleLevel(logging.NewBackendFormatter(logBackends, format))
+		backend.SetLevel(mapLevel(output.Level), "")
+		backends = append(backends, backend)
 		//logging.SetBackend(backend)
 	}
 	logging.SetBackend(backends...)
@@ -76,7 +73,7 @@ func mapLevel(level string) logging.Level {
 	case "DEBUG":
 		return logging.DEBUG
 	case "INFO":
-		return logging.NOTICE
+		return logging.INFO
 	case "WARN":
 		return logging.WARN
 	case "NOTICE":
@@ -88,12 +85,13 @@ func mapLevel(level string) logging.Level {
 	}
 }
 
-func GetLogger() *logging.Logger{
-	if Logger == nil{
+func GetLogger() *logging.Logger {
+	if Logger == nil {
 		cfg := readConfig()
 		setupLogger(cfg)
 	}
 	return Logger
 }
+
 //
 //

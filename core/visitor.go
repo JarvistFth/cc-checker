@@ -8,41 +8,29 @@ import (
 )
 
 type visitor struct {
-
-	lattice map[ssa.Value]map[string]bool
-	seen map[*callgraph.Node]bool
-	sinks map[ssa.CallInstruction]bool
+	lattice  map[ssa.Value]map[string]bool
+	seen     map[*callgraph.Node]bool
 	sinkArgs map[ssa.Value]bool
-
-	returnInstr map[*ssa.Function]*ssa.Return
 }
 
 func NewVisitor() *visitor {
 	return &visitor{
-		seen: make(map[*callgraph.Node]bool),
-		lattice: make(map[ssa.Value]map[string]bool),
-
-		
-		returnInstr: make(map[*ssa.Function]*ssa.Return),
+		seen:     make(map[*callgraph.Node]bool),
+		lattice:  make(map[ssa.Value]map[string]bool),
+		sinkArgs: make(map[ssa.Value]bool),
 	}
 }
 
 func (v *visitor) Visit(node *callgraph.Node) {
-	if !v.seen[node]{
+	if !v.seen[node] {
 		log.Infof("traverse visit: %s", node.String())
 		v.seen[node] = true
 
 		//check source
+		v.loopFunction(node)
 
-		v.loopFunction(node.Func)
-
-		v.handleReturnValue(node)
-
-		v.handleSinkDetection()
-
-
-		for _,outputEdge := range node.Out{
-			if utils.IsSynthetic(outputEdge) || utils.InStd(outputEdge.Callee) || utils.InFabric(outputEdge.Callee){
+		for _, outputEdge := range node.Out {
+			if utils.IsSynthetic(outputEdge) || utils.InStd(outputEdge.Callee) || utils.InFabric(outputEdge.Callee) {
 				v.seen[outputEdge.Callee] = true
 				continue
 			}
@@ -55,136 +43,140 @@ func (v *visitor) Visit(node *callgraph.Node) {
 	}
 }
 
-func (v *visitor) loopFunction(fn *ssa.Function) {
-	if fn == nil{
+func (v *visitor) loopFunction(node *callgraph.Node) {
+	fn := node.Func
+	if fn == nil {
 		log.Errorf("fn == nil!")
 		return
 	}
-	for _,block := range fn.Blocks{
-		for _,instr := range block.Instrs{
-			if ret,ok := instr.(*ssa.Return); ok {
-				v.returnInstr[fn] = ret
-				continue
-			}
+	for _, block := range fn.Blocks {
+		for _, i := range block.Instrs {
 
+			switch instr := i.(type) {
+			case ssa.CallInstruction:
 
-			if call,ok := instr.(ssa.CallInstruction); ok	{
-				v.checkSource(call)
+				v.checkSource(instr)
+				v.checkSink(instr)
 
-				v.checkSink(call)
+			case *ssa.Return:
+				v.handleReturnValue(node, instr)
 			}
 		}
 	}
+	v.handleSinkDetection()
 
 }
-
 
 // check source :
 // if isSource, put call.value into taintSet
-func (v *visitor) checkSource(call ssa.CallInstruction) {
-	if tag,yes := config.IsSource(call); yes{
-		v.taintVal(call.Common().Value,tag)
+func (v *visitor) checkSource(callInstr ssa.Instruction) {
+	if tag, yes := config.IsSource(callInstr.(ssa.CallInstruction)); yes {
+		log.Infof("source fn here: %s", prog.Fset.Position(callInstr.Pos()))
+		v.taint(callInstr, tag)
 	}
 }
 
-func (v *visitor) checkSink(call ssa.CallInstruction) {
-	if ok := config.IsSink(call); ok {
-		v.sinks[call] = true
-		for _,arg := range call.Value().Call.Args{
+func (v *visitor) checkSink(callInstr ssa.Instruction) {
+	if ok := config.IsSink(callInstr.(ssa.CallInstruction)); ok {
+		log.Infof("sink fn here: %s", prog.Fset.Position(callInstr.Pos()))
+		for _, arg := range callInstr.(ssa.CallInstruction).Value().Call.Args {
 			v.sinkArgs[arg] = true
 		}
 	}
 }
 
-
-
-func(v *visitor) taintReferrers(val ssa.Value) {
-	if _,found := v.lattice[val]; found{
+func (v *visitor) taint(i ssa.Instruction, tag string) {
+	switch val := i.(type) {
+	case ssa.Value:
+		v.taintReferrers(i, tag)
+		v.taintVal(val, tag)
+	case *ssa.Store:
+		v.taintReferrers(val, tag)
+		v.taintVal(val.Val, tag)
+		v.taintVal(val.Addr, tag)
+	default:
 		return
 	}
 
-	if val.Referrers() == nil{
-		return
-	}
+}
 
-	for _, r := range *val.Referrers(){
-		if rval,ok := r.(ssa.Value); ok{
+func (v *visitor) taintReferrers(i ssa.Instruction, tag string) {
 
+	if val, ok := i.(ssa.Value); ok {
+		if val.Referrers() == nil {
+			return
 		}
-	}
 
-	if val.Referrers() != nil{
-		for _,ref := range *val.Referrers(){
-			if refval,ok := ref.(ssa.Value);ok{
-				m,ok := v.lattice[val]
-				if !ok{
-					continue
-				}
-				for tag,_ := range m{
-					v.taintVal(refval,tag)
-				}
-				v.taintReferrers(refval)
-			}
+		if v.alreadyTainted(val, tag) {
+			return
 		}
+
+		for _, r := range *val.Referrers() {
+			v.taint(r, tag)
+		}
+	} else {
+		log.Warningf("instr: %s is not a value", i.String())
 	}
 
 }
 
 func (v *visitor) taintVal(val ssa.Value, tag string) {
-	if v.lattice[val] == nil{
+
+	if v.alreadyTainted(val, tag) {
+		return
+	}
+	log.Debugf("taintval: %s, %s, tag:%s", val.Name(), val.String(), tag)
+	if v.lattice[val] == nil {
 		v.lattice[val] = make(map[string]bool)
-		v.lattice[val][tag] = true
-		return
 	}
-
-	if _,found := v.lattice[val][tag]; found{
-		return
-	}else{
-		v.lattice[val][tag] = true
-	}
-
+	v.lattice[val][tag] = true
 }
 
 func (v *visitor) handleSinkDetection() bool {
-	for arg,_ := range v.sinkArgs{
-		if m,ok := v.lattice[arg];ok{
+	for arg, _ := range v.sinkArgs {
+		if m, ok := v.lattice[arg]; ok {
 
-			//report detection
+			//todo: report detection
 			var sinkTag string
-			for tag, _ := range m{
+			for tag, _ := range m {
 				sinkTag += tag + " "
 			}
-			log.Warning("sink here %sinkTag with tag:%sinkTag", prog.Fset.Position(arg.Pos()), sinkTag)
+			log.Warningf("sink here %s sinkTag with tag:%s sinkTag", prog.Fset.Position(arg.Pos()), sinkTag)
 			return true
 		}
 	}
 	return false
 }
 
-func (v *visitor) handleReturnValue(node *callgraph.Node) {
-	 ret,ok := v.returnInstr[node.Func]
-	 if ok{
-		 returnValues := ret.Results
-		 var tags string
+func (v *visitor) handleReturnValue(node *callgraph.Node, retInstr *ssa.Return) {
 
-		 for _,result := range returnValues{
-			 if m,ok := v.lattice[result]; ok{
-				 for tag,_ := range m{
-					 tags += tag + " "
-				 }
-			 }
-		 }
+	ins := node.In
 
-		 inEdges := node.In
+	returnValues := retInstr.Results
+	for _, result := range returnValues {
+		if tags, found := v.lattice[result]; found {
 
-		 for _,inEdge := range inEdges{
-		 	value := inEdge.Site.Value().Call.Value
+			for tag, _ := range tags {
+				for _, in := range ins {
+					callsite := in.Site
+					v.taint(callsite, tag)
+				}
+			}
 
-		 	v.taintVal(value,tags)
-		 	v.taintReferrers(value)
-		 }
-
-	 }
+		}
+	}
 }
 
+func (v *visitor) alreadyTainted(val ssa.Value, tag string) bool {
 
+	if v.lattice[val] == nil {
+		return false
+	}
+
+	if _, found := v.lattice[val][tag]; !found {
+		return false
+	}
+
+	return true
+
+}

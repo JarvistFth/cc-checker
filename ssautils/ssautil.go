@@ -11,18 +11,19 @@ import (
 
 var log = logger.GetLogger()
 
-func BuildSSA(path string) (*ssa.Program ,[]*ssa.Package, error){
+func BuildSSA(path string) (*ssa.Program, []*ssa.Package, error) {
 	ssacfg := &packages.Config{
 		Mode: packages.LoadAllSyntax,
 		Dir:  path,
+		//BuildFlags: []string{"-gcflags=-N -l"} ,
 		BuildFlags: build.Default.BuildTags,
 	}
 	initial, err := packages.Load(ssacfg)
-	if err != nil{
+	if err != nil {
 		log.Fatalf(err.Error())
-		return nil,nil,nil
+		return nil, nil, nil
 	}
-	prog, pkgs := ssautil.AllPackages(initial,0)
+	prog, pkgs := ssautil.AllPackages(initial, 0)
 	prog.Build()
 	//mainpkg, err := MainPackages(pkgs)
 
@@ -31,7 +32,7 @@ func BuildSSA(path string) (*ssa.Program ,[]*ssa.Package, error){
 	//	return prog,nil,nil
 	//}
 
-	return prog,pkgs,nil
+	return prog, pkgs, nil
 }
 
 func MainPackages(pkgs []*ssa.Package) ([]*ssa.Package, error) {

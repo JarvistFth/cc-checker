@@ -20,16 +20,12 @@ require (
 	github.com/spf13/viper v1.7.1 // indirect
 	github.com/sykesm/zap-logfmt v0.0.4 // indirect
 	go.uber.org/zap v1.16.0 // indirect
-	//golang.org/x/tools v0.0.0-20200305224536-de023d59a5d1
+	golang.org/x/tools v0.0.0-20200305224536-de023d59a5d1
 	google.golang.org/grpc v1.34.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	sigs.k8s.io/yaml v1.2.0
 )
 
-require (
-	github.com/emirpasic/gods v1.12.0 // indirect
-	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7 // indirect
-	golang.org/x/tools v0.1.5
-)
+require github.com/op/go-logging v0.0.0-20160315200505-970db520ece7 // indirect
 
 replace github.com/hyperledger/fabric => github.com/hyperledger/fabric v1.4.4

@@ -4,10 +4,15 @@ import (
 	"testing"
 )
 
+var log = GetLogger()
+
 func TestGetLogger(t *testing.T) {
 
-	m := make(map[string]bool)
+	log.Info("hello")
 
-	m["123"] = true
+	log.Debug("ok")
 
+	log.Warning("123")
+
+	log.Error("231")
 }

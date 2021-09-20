@@ -85,41 +85,40 @@ func DecomposeFunction(f *ssa.Function) (path, recv, name string) {
 		recv = UnqualifiedName(recvVar)
 	}
 
-	//fmt.Printf("path:%s, recv:%s, name:%s\n",path,recv,name)
-	// log.Infof("path:%s, recv:%s, name:%s\n",path,recv,name)
+	log.Debugf("path:%s, recv:%s, name:%s", path, recv, name)
 
 	return
 }
 
-func DecomposeAbstractMethod(callCom *ssa.CallCommon) (path,recv,name string){
-	if callCom.Method.Pkg() != nil{
+func DecomposeAbstractMethod(callCom *ssa.CallCommon) (path, recv, name string) {
+	if callCom.Method.Pkg() != nil {
 		path = callCom.Method.Pkg().Path()
 	}
 
 	typename := callCom.Value.Type().String()
-	relativepkgs := strings.Split(typename,"/")
-	objname := relativepkgs[len(relativepkgs) - 1]
+	relativepkgs := strings.Split(typename, "/")
+	objname := relativepkgs[len(relativepkgs)-1]
 	recv = objname
 	name = callCom.Method.Name()
 	return
 }
 func FindMethod(prog *ssa.Program, ssaPkg *ssa.Package, name string) *ssa.Function {
 	var ret *ssa.Function
-	for _,member := range ssaPkg.Members{
-		if ty,ok := member.(*ssa.Type); ok{
+	for _, member := range ssaPkg.Members {
+		if ty, ok := member.(*ssa.Type); ok {
 			t := ty.Type()
 			p := types.NewPointer(t)
-			initselt := prog.MethodSets.MethodSet(t).Lookup(ssaPkg.Pkg,name)
-			initselp := prog.MethodSets.MethodSet(p).Lookup(ssaPkg.Pkg,name)
-			if initselt != nil{
-				ret = prog.LookupMethod(t, ssaPkg.Pkg,name)
+			initselt := prog.MethodSets.MethodSet(t).Lookup(ssaPkg.Pkg, name)
+			initselp := prog.MethodSets.MethodSet(p).Lookup(ssaPkg.Pkg, name)
+			if initselt != nil {
+				ret = prog.LookupMethod(t, ssaPkg.Pkg, name)
 			}
-			if initselp != nil{
-				ret = prog.LookupMethod(p, ssaPkg.Pkg,name)
+			if initselp != nil {
+				ret = prog.LookupMethod(p, ssaPkg.Pkg, name)
 			}
-			if ret == nil{
+			if ret == nil {
 				continue
-			}else {
+			} else {
 				break
 			}
 		}
@@ -129,17 +128,17 @@ func FindMethod(prog *ssa.Program, ssaPkg *ssa.Package, name string) *ssa.Functi
 
 func FindMethodByType(prog *ssa.Program, ssaPkg *ssa.Package, t types.Type, name string) *ssa.Function {
 	var ret *ssa.Function
-	for _, impotedPkg := range ssaPkg.Pkg.Imports(){
+	for _, impotedPkg := range ssaPkg.Pkg.Imports() {
 		p := types.NewPointer(t)
-		initselt := prog.MethodSets.MethodSet(t).Lookup(impotedPkg,name)
-		initselp := prog.MethodSets.MethodSet(p).Lookup(impotedPkg,name)
+		initselt := prog.MethodSets.MethodSet(t).Lookup(impotedPkg, name)
+		initselp := prog.MethodSets.MethodSet(p).Lookup(impotedPkg, name)
 		log.Info(prog.MethodSets.MethodSet(t).String())
 
-		if initselt != nil{
-			ret = prog.LookupMethod(t, impotedPkg,name)
+		if initselt != nil {
+			ret = prog.LookupMethod(t, impotedPkg, name)
 		}
-		if initselp != nil{
-			ret = prog.LookupMethod(p, impotedPkg,name)
+		if initselp != nil {
+			ret = prog.LookupMethod(p, impotedPkg, name)
 		}
 	}
 
@@ -149,16 +148,16 @@ func FindMethodByType(prog *ssa.Program, ssaPkg *ssa.Package, t types.Type, name
 func FindMethodWithAllPkgs(prog *ssa.Program, ssaPkgs []*ssa.Package, t types.Type, name string) *ssa.Function {
 	var ret *ssa.Function
 	p := types.NewPointer(t)
-	for _, ssaPkg := range ssaPkgs{
-		selectiont := prog.MethodSets.MethodSet(t).Lookup(ssaPkg.Pkg,name)
-		selectionp := prog.MethodSets.MethodSet(p).Lookup(ssaPkg.Pkg,name)
-		if selectiont != nil{
-			ret = prog.LookupMethod(t, ssaPkg.Pkg,name)
+	for _, ssaPkg := range ssaPkgs {
+		selectiont := prog.MethodSets.MethodSet(t).Lookup(ssaPkg.Pkg, name)
+		selectionp := prog.MethodSets.MethodSet(p).Lookup(ssaPkg.Pkg, name)
+		if selectiont != nil {
+			ret = prog.LookupMethod(t, ssaPkg.Pkg, name)
 		}
-		if selectionp != nil{
-			ret = prog.LookupMethod(p, ssaPkg.Pkg,name)
+		if selectionp != nil {
+			ret = prog.LookupMethod(p, ssaPkg.Pkg, name)
 		}
-		if ret != nil{
+		if ret != nil {
 			log.Infof("find method %s in pkg: %s", name, ssaPkg)
 			return ret
 		}
@@ -166,37 +165,37 @@ func FindMethodWithAllPkgs(prog *ssa.Program, ssaPkgs []*ssa.Package, t types.Ty
 	return ret
 }
 
-func FindInvokeMethod(prog *ssa.Program, mainPkg *ssa.Package) (*ssa.Function,*ssa.Function){
+func FindInvokeMethod(prog *ssa.Program, mainPkg *ssa.Package) (*ssa.Function, *ssa.Function) {
 	var initf *ssa.Function
 	var invokef *ssa.Function
-	for _,member := range mainPkg.Members{
-		if ty,ok := member.(*ssa.Type); ok{
+	for _, member := range mainPkg.Members {
+		if ty, ok := member.(*ssa.Type); ok {
 			t := ty.Type()
 			p := types.NewPointer(t)
-			initselt := prog.MethodSets.MethodSet(t).Lookup(mainPkg.Pkg,"Invoke")
-			initselp := prog.MethodSets.MethodSet(p).Lookup(mainPkg.Pkg,"Invoke")
-			if initselt != nil{
-				initf = prog.LookupMethod(t,mainPkg.Pkg,"Init")
-				invokef = prog.LookupMethod(t,mainPkg.Pkg,"Invoke")
+			initselt := prog.MethodSets.MethodSet(t).Lookup(mainPkg.Pkg, "Invoke")
+			initselp := prog.MethodSets.MethodSet(p).Lookup(mainPkg.Pkg, "Invoke")
+			if initselt != nil {
+				initf = prog.LookupMethod(t, mainPkg.Pkg, "Init")
+				invokef = prog.LookupMethod(t, mainPkg.Pkg, "Invoke")
 			}
-			if initselp != nil{
-				initf = prog.LookupMethod(p,mainPkg.Pkg,"Init")
-				invokef = prog.LookupMethod(p,mainPkg.Pkg,"Invoke")
+			if initselp != nil {
+				initf = prog.LookupMethod(p, mainPkg.Pkg, "Init")
+				invokef = prog.LookupMethod(p, mainPkg.Pkg, "Invoke")
 			}
-			if initf == nil || invokef == nil{
+			if initf == nil || invokef == nil {
 				continue
-			}else {
+			} else {
 				break
 			}
 		}
 	}
-	return initf,invokef
+	return initf, invokef
 }
 
 func ReverseNewSlice(s []interface{}) []interface{} {
-	t := make([]interface{},len(s))
-	j := len(s)-1
-	for i,_ := range s{
+	t := make([]interface{}, len(s))
+	j := len(s) - 1
+	for i, _ := range s {
 		t[i] = s[j]
 		j -= 1
 	}

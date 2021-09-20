@@ -23,19 +23,18 @@ func init() {
 //}
 
 func initial() *ssa.Function {
-	cfg,err := config.ReadConfig("../config/config.yaml")
-	if err != nil{
+	cfg, err := config.ReadConfig()
+	if err != nil {
 		log.Fatalf(err.Error())
 	}
 	log.Info(cfg.String())
 
-	prog,mains,err := ssautils.BuildSSA("../ccs/timerandomcc/")
-	if err != nil{
+	prog, mains, err := ssautils.BuildSSA("../ccs/timerandomcc/")
+	if err != nil {
 		log.Fatalf(err.Error())
 	}
 
-	_,invokef := utils.FindInvokeMethod(prog,mains[0])
-
+	_, invokef := utils.FindInvokeMethod(prog, mains[0])
 
 	return invokef
 
