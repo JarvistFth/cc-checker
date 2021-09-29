@@ -20,6 +20,7 @@ import (
 	"go/build"
 	"go/types"
 	"golang.org/x/tools/go/callgraph"
+	"golang.org/x/tools/go/pointer"
 	"golang.org/x/tools/go/ssa"
 	"strings"
 )
@@ -213,4 +214,34 @@ func InStd(node *callgraph.Node) bool {
 
 func InFabric(node *callgraph.Node) bool {
 	return strings.Contains(node.Func.Pkg.Pkg.Path(), "fabric")
+}
+
+func CanPointToVal(v ssa.Value) bool {
+	log.Debugf("direct %s=%s",v.Name(),v.String())
+	if !pointer.CanPoint(v.Type()) {
+		return false
+	}
+	return true
+}
+
+func CanPointToInDirect(v ssa.Value) bool {
+	log.Debugf("indirect %s=%s",v.Name(),v.String())
+	t := v.Type()
+	//if call, ok := v.(*ssa.Call); ok {
+	//	t = call.Common().Value.Type()
+	//}
+	_, isRange := v.(*ssa.Range)
+	if isRange {
+		return false
+	}
+	_, isPointer := t.Underlying().(*types.Pointer)
+	if !isPointer {
+		return false
+	}
+
+	if !pointer.CanPoint(t.Underlying().(*types.Pointer).Elem()) {
+		return false
+	}
+
+	return true
 }

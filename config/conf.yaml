@@ -2,6 +2,8 @@ sinks:
   - package: "github.com/hyperledger/fabric/core/chaincode/shim"
     method: "PutState"
     receiver: "shim.ChaincodeStubInterface"
+  - package: "cc-checker/ccs/hello"
+    method: "sink"
 sources:
   - package: "math/rand"
     method: "Int"
