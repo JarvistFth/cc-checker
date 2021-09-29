@@ -4,6 +4,7 @@ import (
 	"cc-checker/config"
 	"cc-checker/ssautils"
 	"cc-checker/utils"
+	"golang.org/x/tools/go/pointer"
 	"golang.org/x/tools/go/ssa"
 )
 
@@ -14,6 +15,8 @@ var invokef *ssa.Function
 var cfg *config.Config
 
 var allpkgs []*ssa.Package
+
+var result *pointer.Result
 
 func Init() {
 	cfg, err := config.ReadConfig()
