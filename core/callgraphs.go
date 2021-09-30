@@ -1,7 +1,6 @@
 package core
 
 import (
-	"cc-checker/utils"
 	"golang.org/x/tools/go/callgraph"
 	"golang.org/x/tools/go/pointer"
 	"golang.org/x/tools/go/ssa"
@@ -31,20 +30,20 @@ func BuildCallGraph(mainpkg []*ssa.Package, querys ...*ssa.Function) *pointer.Re
 	//	}
 	//}
 
-	for _, fn := range querys{
-		for _,block := range fn.Blocks{
-			for _, instr := range block.Instrs{
-				if val,ok := instr.(ssa.Value);ok{
-					if utils.CanPointToVal(val){
-						cfg.AddQuery(val)
-					}
-					if utils.CanPointToInDirect(val){
-						cfg.AddIndirectQuery(val)
-					}
-				}
-			}
-		}
-	}
+	//for _, fn := range querys{
+	//	for _,block := range fn.Blocks{
+	//		for _, instr := range block.Instrs{
+	//			if val,ok := instr.(ssa.Value);ok{
+	//				if utils.CanPointToVal(val){
+	//					cfg.AddQuery(val)
+	//				}
+	//				if utils.CanPointToInDirect(val){
+	//					cfg.AddIndirectQuery(val)
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
 
 	result,err := pointer.Analyze(cfg)
 	if err != nil{

@@ -86,7 +86,7 @@ func DecomposeFunction(f *ssa.Function) (path, recv, name string) {
 		recv = UnqualifiedName(recvVar)
 	}
 
-	log.Debugf("path:%s, recv:%s, name:%s", path, recv, name)
+	//log.Debugf("path:%s, recv:%s, name:%s", path, recv, name)
 
 	return
 }

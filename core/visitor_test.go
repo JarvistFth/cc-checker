@@ -72,9 +72,9 @@ func TestVisitor_Visit2(t *testing.T) {
 		v := NewVisitor()
 		v.Visit(result.CallGraph.Nodes[invokef])
 
-		for val,pt := range result.Queries{
-			log.Debugf("value: %s=%s, points to:%s", val.Name(),val.String(), pt.PointsTo().String())
-		}
+		//for val,pt := range result.Queries{
+		//	log.Debugf("value: %s=%s, points to:%s", val.Name(),val.String(), pt.PointsTo().String())
+		//}
 		//nd := result.CallGraph.Nodes[invokef]
 		//for _, out := range nd.Out{
 		//	v := NewVisitor()
@@ -122,6 +122,7 @@ func TestVisitor_VisitMain(t *testing.T) {
 		//	log.Infof("invoke out:%s", out.Callee.String())
 		//	v.Visit(out.Callee)
 		//}
+		v.handleSinkDetection()
 	} else {
 		log.Infof("invoke func is nil\n")
 	}

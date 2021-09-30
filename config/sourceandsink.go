@@ -115,7 +115,7 @@ func IsSink(call ssa.CallInstruction) bool {
 	callcom := call.Common()
 	if fn := callcom.StaticCallee(); fn != nil {
 		path, recv, name := utils.DecomposeFunction(fn)
-		log.Debugf("sink static callee: %s, %s, %s", path, recv, name)
+		//log.Debugf("sink static callee: %s, %s, %s", path, recv, name)
 		for _, s := range SSconfig.Sinks {
 			if s.Package == path && s.Receiver == recv && s.Method == name {
 				return true
@@ -125,7 +125,7 @@ func IsSink(call ssa.CallInstruction) bool {
 		//invoke mode
 		if callcom.IsInvoke() {
 			path, recv, name := utils.DecomposeAbstractMethod(callcom)
-			log.Debugf("sink invoke callee: %s, %s, %s", path, recv, name)
+			//log.Debugf("sink invoke callee: %s, %s, %s", path, recv, name)
 			for _, s := range SSconfig.Sinks {
 				if s.Package == path && s.Receiver == recv && s.Method == name {
 					return true
@@ -141,9 +141,9 @@ func IsSink(call ssa.CallInstruction) bool {
 func IsSource(call ssa.CallInstruction) (string, bool) {
 	callcom := call.Common()
 	if fn := callcom.StaticCallee(); fn != nil {
-		log.Debugf("source static fn:%s, name:%s", fn.String(), fn.Name())
+		//log.Debugf("source static fn:%s, name:%s", fn.String(), fn.Name())
 		path, recv, name := utils.DecomposeFunction(fn)
-		log.Debugf("source static callee: %s, receiver:%s, name:%s", path, recv, name)
+		//log.Debugf("source static callee: %s, receiver:%s, name:%s", path, recv, name)
 		for _, s := range SSconfig.Sources {
 			if s.Package == path && s.Receiver == recv && s.Method == name {
 				return s.Tag, true
@@ -153,7 +153,7 @@ func IsSource(call ssa.CallInstruction) (string, bool) {
 		//invoke mode
 		if callcom.IsInvoke() {
 			path, recv, name := utils.DecomposeAbstractMethod(callcom)
-			log.Debugf("source invoke callee: %s, receiver:%s, %s", path, recv, name)
+			//log.Debugf("source invoke callee: %s, receiver:%s, %s", path, recv, name)
 			for _, s := range SSconfig.Sources {
 				if s.Package == path && s.Receiver == recv && s.Method == name {
 					return s.Tag, true

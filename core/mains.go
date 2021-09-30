@@ -18,6 +18,8 @@ var allpkgs []*ssa.Package
 
 var result *pointer.Result
 
+var outputResult map[string]bool
+
 func Init() {
 	cfg, err := config.ReadConfig()
 	if err != nil {
