@@ -1,177 +1,200 @@
 package core
-//
-//import "golang.org/x/tools/go/ssa"
-//
-//// TaintTable node with taint-tag
-//var TaintTable map[ssa.Value]string
-//
-//func init() {
-//	TaintTable = map[ssa.Value]string{}
-//}
-//
-//
-//func(c *CallContext) TaintReferers(val ssa.Value, tag string){
-//	ref := val.Referrers()
-//	if ref == nil{
-//		return
-//	}
-//
-//	for _, instr := range *ref{
-//		c.TaintNode(instr.(ssa.Node),tag)
-//	}
-//}
-//
-//func(c *CallContext) TaintNode(node ssa.Node, tag string) {
-//	val,_ := node.(ssa.Value)
-//	//TaintTable[val] = tag
-//	switch n := node.(type) {
-//	case *ssa.Alloc:
-//		// dont need taint
-//		return
-//
-//	case *ssa.Call:
-//
-//		//check stdlib
-//
-//		//check builtin
-//
-//		//not two above, initialize a new function
-//		//1. init callctx with entryTaint
-//		//2. if callctx has initialzed, msgSet me.valueTaintBit = callctx.exitvalue
-//		//3. callctx not initialized, init it, analyze it.
-//		fn := extractCallee(n)
-//		if fn == nil{
-//			// invoke mode, don't get in
-//			break
-//		}
-//		args := n.Call.Args
-//		taintp := NewTaintParams()
-//
-//		for i,arg := range args{
-//			if tag,ok := c.taintSet[arg];ok{
-//				taintp[i] = tag
-//			}
-//		}
-//
-//
-//		//entryTaint := taintArgs(c.fn.Params,taintp)
-//
-//
-//		var callctx *CallContext
-//		var ok bool
-//		if callctx,ok = AnalyzedCall(fn,taintp);ok{
-//			// has initialzed, msgSet its exit value to me.value
-//
-//			exit := CallContexts[callctx.key].exit
-//
-//			for _,tag := range exit{
-//				c.taintSet[n.Value()] += tag + " "
-//			}
-//
-//
-//		}else {
-//			callctx = NewCallContext(fn,taintp)
-//			callctx.Initialize()
-//		}
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//	case *ssa.Go:
-//		// init new ctx
-//
-//	case *ssa.Field:
-//
-//	case *ssa.FieldAddr:
-//
-//	// Only the Addr (the Value that is being written to) should be visited.
-//	case *ssa.Store:
-//
-//	// Only the Map itself can be tainted by an Update.
-//	// The Key can't be tainted.
-//	// The Value can propagate taint to the Map, but not receive it.
-//	// MapUpdate has no referrers, it is only an Instruction, not a Value.
-//	case *ssa.MapUpdate:
-//
-//
-//	case *ssa.Select:
-//		//todo support select
-//
-//	// The only Operand that can be tainted by a Send is the Chan.
-//	// The Value can propagate taint to the Chan, but not receive it.
-//	// Send has no referrers, it is only an Instruction, not a Value.
-//	case *ssa.Send:
-//
-//
-//		// This allows taint to propagate backwards into the sliced value
-//		// when the resulting value is tainted
-//
-//	// These nodes' operands should not be visited, because they can only receive
-//	// taint from their operands, not propagate taint to them.
-//	case *ssa.BinOp,*ssa.IndexAddr,*ssa.Lookup:
-//		var x,y ssa.Value
-//		switch nn := n.(type) {
-//		case *ssa.BinOp:
-//			x = nn.X
-//			y = nn.Y
-//		case *ssa.IndexAddr:
-//			x = nn.X
-//			y = nn.Index
-//		case *ssa.Lookup:
-//			x = nn.X
-//			y = nn.Index
-//		}
-//
-//
-//
-//	case *ssa.ChangeInterface, *ssa.ChangeType, *ssa.Convert, *ssa.Extract, *ssa.Index, *ssa.MakeInterface, *ssa.Next, *ssa.Range, *ssa.Slice, *ssa.TypeAssert:
-//
-//		var x ssa.Value
-//		switch nn := n.(type) {
-//		case *ssa.ChangeInterface:
-//			x = nn.X
-//		case *ssa.ChangeType:
-//			x = nn.X
-//		case *ssa.Convert:
-//			x = nn.X
-//		case *ssa.Extract:
-//			x = nn.Tuple
-//		case *ssa.Index:
-//			x = nn.X
-//		case *ssa.MakeInterface:
-//			x = nn.X
-//		case *ssa.Next:
-//			x = nn.Iter
-//		case *ssa.Range:
-//			x = nn.X
-//		case *ssa.Slice:
-//			x = nn.X
-//		case *ssa.TypeAssert:
-//			x = nn.X
-//		}
-//
-//
-//	// These nodes don't have operands; they are Values, not Instructions.
-//
-//	case *ssa.UnOp:
-//		x := n.X
-//
-//
-//	case *ssa.Return:
-//		//flow results to currentctx.exitvalue
-//
-//
-//	// These nodes cannot propagate taint.
-//	case  *ssa.DebugRef, *ssa.Defer, *ssa.If, *ssa.Jump, *ssa.MakeClosure, *ssa.Panic, *ssa.RunDefers:
-//
-//	default:
-//		//todo handle phi
-//		//log.Errorf("unexpected node received: %T %v; please report this issue\n", n, n)
-//
-//	}
-//}
+
+import (
+	"cc-checker/config"
+	"cc-checker/utils"
+	"fmt"
+	"golang.org/x/tools/go/callgraph"
+	"golang.org/x/tools/go/ssa"
+)
+
+func (v *visitor) taintCallSigParams(callInstr ssa.CallInstruction) {
+	if callInstr.Common().StaticCallee() == nil{
+		return
+	}
+	args := callInstr.Common().Args
+	fn := callInstr.Common().StaticCallee()
+	params := fn.Params
+
+	for i,arg := range args{
+		if tags,ok := v.lattice[arg];ok{
+			for tag,_ := range tags.msgSet {
+				v.taintVal(params[i],tag)
+				log.Infof("fn:%s, taint params:%s=%s", fn.Name(), arg.Name(),arg.String())
+			}
+		}
+	}
+
+}
+
+func (v *visitor) taint(i ssa.Instruction, tag string) {
+	switch val := i.(type) {
+	//todo: stdlib call function taint flow
+	case ssa.CallInstruction:
+		if _,yes := config.IsSource(val); yes{
+			if v.alreadyTaintedWithTag(val.(ssa.Value), tag) {
+				return
+			}
+			v.taintVal(val.(ssa.Value), tag)
+			v.taintReferrers(i, tag)
+		}else{
+			if yes := utils.IsStdCall(val); yes{
+				log.Debugf("stdcall: %s", val.String())
+				if v.alreadyTaintedWithTag(val.Value().Call.Value, tag) {
+					return
+				}
+				v.taintVal(val.Value().Call.Value, tag)
+				v.taintReferrers(i, tag)
+				//args := val.Value().Call.Args
+				//for _,arg := range args{
+				//	if v.alreadyTainted(arg){
+				//
+				//	}
+				//}
+				//summ := summary.For(val)
+				//if summ.IfTainted != 0{
+				//
+				//}
+			}
+		}
+
+
+
+	case ssa.Value:
+		if v.alreadyTaintedWithTag(val, tag) {
+			return
+		}
+		v.taintVal(val, tag)
+		v.taintReferrers(i, tag)
+		//v.taintPointers(val,tag)
+	case *ssa.Store:
+		if v.alreadyTaintedWithTag(val.Addr, tag) {
+			return
+		}
+		v.taintVal(val.Addr, tag)
+		v.taintReferrers(val, tag)
+		v.taintPointers(val.Addr,tag)
+		//v.taintVal(val.Val, tag)
+
+	default:
+		return
+	}
+
+}
+
+func (v *visitor) taintPointers(addr ssa.Value, tag string)  {
+	log.Debugf("taint pointer: %s, %p",addr.Name(), addr)
+
+	for val,_ := range v.ptrs[addr]{
+		log.Debugf("addr points to %s=%s", val.Name(),val.String())
+		if i,ok := val.(ssa.Instruction);ok{
+			log.Debugf("taint pointer: %s=%s", val.Name(),val.String())
+			v.taint(i,tag)
+		}
+	}
+}
+
+func (v *visitor) taintReferrers(i ssa.Instruction, tag string) {
+
+	if val, ok := i.(ssa.Value); ok {
+		if val.Referrers() == nil {
+			return
+		}
+		for _, r := range *val.Referrers() {
+			v.taint(r, tag)
+		}
+	} else if st, ok := i.(*ssa.Store); ok {
+		addr := st.Addr
+		log.Warningf("instr: %s is store instr", i.String())
+		if addr.Referrers() == nil {
+			return
+		}
+
+		for _, r := range *addr.Referrers() {
+			log.Infof("store addr ref: %s", r.String())
+			v.taint(r, tag)
+		}
+	} else{
+		log.Warningf("instr: %s is not a value and store instr", i.String())
+	}
+
+}
+
+func (v *visitor) taintVal(val ssa.Value, tag string) {
+
+	if v.alreadyTaintedWithTag(val, tag) {
+		return
+	}
+	log.Debugf("taintval: %s, %s, tag:%s", val.Name(), val.String(), tag)
+	if v.lattice[val] == nil {
+		v.lattice[val] = new(LatticeTag)
+	}
+	v.lattice[val].Add(tag)
+}
+
+func (v *visitor) handleSinkDetection() bool {
+	outputResult = make(map[string]bool)
+	log.Debugf("sink arg map len: %d", len(v.sinkArgs))
+	for callInstr,m := range v.sinkArgs {
+		for arg,_ := range m{
+			log.Debugf("sink arg: %s=%s", arg.Name(),arg.String())
+			if tags, ok := v.lattice[arg]; ok {
+				//todo: report detection
+				output := fmt.Sprintf("sink here %s with tag:%s ",prog.Fset.Position(callInstr.Pos()),tags.String())
+				outputResult[output] = true
+				//return true
+			}
+		}
+
+	}
+
+	for o,_ := range outputResult{
+		log.Warning(o)
+	}
+
+	return false
+}
+
+func (v *visitor) handleReturnValue(node *callgraph.Node, retInstr *ssa.Return) {
+
+	ins := node.In
+
+	returnValues := retInstr.Results
+	for _, result := range returnValues {
+		if tags, found := v.lattice[result]; found {
+			log.Debugf("lattice return value: %s", result.Name())
+			for tag, _ := range tags.msgSet {
+				for _, in := range ins {
+					callsite := in.Site
+					v.taint(callsite, tag)
+				}
+			}
+
+		}
+	}
+}
+
+func (v *visitor) alreadyTaintedWithTag(val ssa.Value, tag string) bool {
+
+	if v.lattice[val] == nil {
+		return false
+	}
+
+	if !v.lattice[val].Contains(tag){
+		return false
+	}
+
+	return true
+}
+
+
+func (v *visitor) alreadyTainted(val ssa.Value) bool {
+	tag,ok := v.lattice[val]
+
+	if tag == nil{
+		return false
+	}
+
+	return ok
+}
+

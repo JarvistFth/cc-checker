@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	"github.com/hyperledger/fabric/protos/peer"
-	"time"
 )
 
 // SimpleAsset implements a simple chaincode to manage an asset
@@ -43,30 +42,26 @@ func (t *SimpleAsset) Init(stub shim.ChaincodeStubInterface) peer.Response {
 // method may create a new asset by specifying a new key-value pair.
 func (t *SimpleAsset) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 	// Extract the function and args from the transaction proposal
-	fn, args := stub.GetFunctionAndParameters()
-
-	var result string
-	var err error
 
 
+	kv := make(map[string]string)
 
-	if fn == "setWithRand" {
-
-
-		result, err = set(stub, args)
-	} else if fn == "get"{ // assume 'get' even if fn is nil
-		result, err = get(stub, args)
-	}else if fn == "setWithTime"{
-		var t = time.Now().Format("2006-01-02 15:04:05.999999")
-		args[1] += t
-		result, err = set(stub, args)
+	for id := 0; id < 100; id++{
+		kv[fmt.Sprintf("%d",id)] = "id:" + fmt.Sprintf("%d",id)
 	}
-	if err != nil {
-		return shim.Error(err.Error())
+
+
+	for k,v := range kv{
+		err := stub.PutState(k, []byte(v))
+		if err != nil{
+			return shim.Error(err.Error())
+		}
+
+
 	}
 
 	// Return the result as success payload
-	return shim.Success([]byte(result))
+	return shim.Success([]byte("success"))
 }
 
 // Set stores the asset (both key and value) on the ledger. If the key exists,

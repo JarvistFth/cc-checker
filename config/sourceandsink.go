@@ -33,10 +33,25 @@ type Source struct {
 	Tag      string `json:"tag"`
 }
 
+
+type Reads struct {
+	Package  string `json:"package"`
+	Method   string `json:"method"`
+	Receiver string `json:"receiver"`
+}
+
+type Writes struct {
+	Package  string `json:"package"`
+	Method   string `json:"method"`
+	Receiver string `json:"receiver"`
+}
+
 type Config struct {
 	Sources  []Source  `json:"sources"`
 	Sinks    []Sink    `json:"sinks"`
 	Excludes []Exclude `json:"excludes"`
+	Reads	 []Reads   `json:"reads"`
+	Writes	 []Writes  `json:"writes"`
 }
 
 func ReadConfig() (*Config, error) {
@@ -165,4 +180,58 @@ func IsSource(call ssa.CallInstruction) (string, bool) {
 	}
 
 	return "", false
+}
+
+func IsCCRead(call ssa.CallInstruction) bool {
+	callcom := call.Common()
+	if fn := callcom.StaticCallee(); fn != nil {
+		path, recv, name := utils.DecomposeFunction(fn)
+		//log.Debugf("sink static callee: %s, %s, %s", path, recv, name)
+		for _, s := range SSconfig.Reads {
+			if s.Package == path && s.Receiver == recv && s.Method == name {
+				return true
+			}
+		}
+	} else {
+		//invoke mode
+		if callcom.IsInvoke() {
+			path, recv, name := utils.DecomposeAbstractMethod(callcom)
+			//log.Debugf("sink invoke callee: %s, %s, %s", path, recv, name)
+			for _, s := range SSconfig.Reads {
+				if s.Package == path && s.Receiver == recv && s.Method == name {
+					return true
+				}
+			}
+		} else {
+			//dynamic call mode
+		}
+	}
+	return false
+}
+
+func IsCCWrite(call ssa.CallInstruction) bool {
+	callcom := call.Common()
+	if fn := callcom.StaticCallee(); fn != nil {
+		path, recv, name := utils.DecomposeFunction(fn)
+		//log.Debugf("sink static callee: %s, %s, %s", path, recv, name)
+		for _, s := range SSconfig.Writes {
+			if s.Package == path && s.Receiver == recv && s.Method == name {
+				return true
+			}
+		}
+	} else {
+		//invoke mode
+		if callcom.IsInvoke() {
+			path, recv, name := utils.DecomposeAbstractMethod(callcom)
+			//log.Debugf("sink invoke callee: %s, %s, %s", path, recv, name)
+			for _, s := range SSconfig.Writes {
+				if s.Package == path && s.Receiver == recv && s.Method == name {
+					return true
+				}
+			}
+		} else {
+			//dynamic call mode
+		}
+	}
+	return false
 }

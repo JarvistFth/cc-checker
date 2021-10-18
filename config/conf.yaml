@@ -12,6 +12,7 @@ sources:
   - package: "time"
     method: "Now"
     tag: "time"
+
 excludes:
   - package: "github.com/hyperledger/fabric/core/chaincode/shim"
     method: "Error"
