@@ -1,29 +1,29 @@
 package core
 
 type LatticeTag struct {
-	tag     string
-	hashset map[string]bool
+	tag    string
+	msgSet map[string]bool
 }
 
 func (t *LatticeTag) Add(tag string) {
-	if t.hashset == nil{
-		t.hashset = make(map[string]bool)
+	if t.msgSet == nil{
+		t.msgSet = make(map[string]bool)
 	}
-	if _,ok := t.hashset[tag];ok{
+	if _,ok := t.msgSet[tag];ok{
 		return
 	}
 
 	t.tag += tag + " | "
-	t.hashset[tag] = true
+	t.msgSet[tag] = true
 }
 
 func (t *LatticeTag) Contains(tag string) bool {
-	_,ok :=t.hashset[tag]
+	_,ok :=t.msgSet[tag]
 	return ok
 }
 
 func (t *LatticeTag) Delete(tag string) {
-	delete(t.hashset,tag)
+	delete(t.msgSet,tag)
 }
 
 func (t *LatticeTag) String() string {

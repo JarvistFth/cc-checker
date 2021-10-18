@@ -37,7 +37,7 @@ package core
 //
 //		//not two above, initialize a new function
 //		//1. init callctx with entryTaint
-//		//2. if callctx has initialzed, hashset me.valueTaintBit = callctx.exitvalue
+//		//2. if callctx has initialzed, msgSet me.valueTaintBit = callctx.exitvalue
 //		//3. callctx not initialized, init it, analyze it.
 //		fn := extractCallee(n)
 //		if fn == nil{
@@ -60,7 +60,7 @@ package core
 //		var callctx *CallContext
 //		var ok bool
 //		if callctx,ok = AnalyzedCall(fn,taintp);ok{
-//			// has initialzed, hashset its exit value to me.value
+//			// has initialzed, msgSet its exit value to me.value
 //
 //			exit := CallContexts[callctx.key].exit
 //

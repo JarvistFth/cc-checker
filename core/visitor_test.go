@@ -24,7 +24,7 @@ func TestVisitor_Visit(t *testing.T) {
 	result := BuildCallGraph(mainpkgs)
 	_, invokef := utils.FindInvokeMethod(prog, mainpkgs[0])
 	//var putstatefn *ssa.Function
-	//fn := mainpkgs[0].Func("hashset")
+	//fn := mainpkgs[0].Func("msgSet")
 	var wg sync.WaitGroup
 	defer wg.Wait()
 	if invokef != nil {

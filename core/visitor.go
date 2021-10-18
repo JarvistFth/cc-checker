@@ -103,6 +103,7 @@ func (v *visitor) Visit(node *callgraph.Node) {
 	//}else{
 	//	log.Infof("node fn has visited before: %s", node.String())
 	//}
+
 }
 
 func (v *visitor) loopFunction(node *callgraph.Node) {
@@ -123,7 +124,7 @@ func (v *visitor) loopFunction(node *callgraph.Node) {
 			}
 
 			for _,ref := range *param.Referrers(){
-				for tag,_ := range tags.hashset{
+				for tag,_ := range tags.msgSet {
 					v.taint(ref,tag)
 				}
 			}
@@ -145,7 +146,7 @@ func (v *visitor) loopFunction(node *callgraph.Node) {
 				log.Debugf("put FieldAddr %p", addr)
 				v.ptrs.Put(i.(ssa.Value),instr.X)
 				if tags,ok := v.lattice[addr];ok{
-					for tag,_ := range tags.hashset{
+					for tag,_ := range tags.msgSet {
 						v.taintPointers(addr,tag)
 					}
 				}
@@ -157,7 +158,7 @@ func (v *visitor) loopFunction(node *callgraph.Node) {
 				log.Debugf("put IndexAddr %p", addr)
 				v.ptrs.Put(addr,instr.X)
 				if tags,ok := v.lattice[addr];ok{
-					for tag,_ := range tags.hashset{
+					for tag,_ := range tags.msgSet {
 						v.taintPointers(addr,tag)
 					}
 				}
@@ -193,7 +194,7 @@ func (v *visitor) taintCallSigParams(callInstr ssa.CallInstruction) {
 
 	for i,arg := range args{
 		if tags,ok := v.lattice[arg];ok{
-			for tag,_ := range tags.hashset{
+			for tag,_ := range tags.msgSet {
 				v.taintVal(params[i],tag)
 				log.Infof("fn:%s, taint params:%s=%s", fn.Name(), arg.Name(),arg.String())
 			}
@@ -224,24 +225,45 @@ func (v *visitor) checkSink(callInstr ssa.Instruction) {
 func (v *visitor) taint(i ssa.Instruction, tag string) {
 	switch val := i.(type) {
 	//todo: stdlib call function taint flow
-	//case ssa.CallInstruction:
-	//	if _,yes := config.IsSource(val); yes{
-	//		if v.alreadyTainted(val.(ssa.Value), tag) {
-	//			return
-	//		}
-	//		v.taintVal(val.(ssa.Value), tag)
-	//		v.taintReferrers(i, tag)
-	//	}
-	//	break
+	case ssa.CallInstruction:
+		if _,yes := config.IsSource(val); yes{
+			if v.alreadyTaintedWithTag(val.(ssa.Value), tag) {
+				return
+			}
+			v.taintVal(val.(ssa.Value), tag)
+			v.taintReferrers(i, tag)
+		}else{
+			if yes := utils.IsStdCall(val); yes{
+				log.Debugf("stdcall: %s", val.String())
+				if v.alreadyTaintedWithTag(val.Value().Call.Value, tag) {
+					return
+				}
+				v.taintVal(val.Value().Call.Value, tag)
+				v.taintReferrers(i, tag)
+				//args := val.Value().Call.Args
+				//for _,arg := range args{
+				//	if v.alreadyTainted(arg){
+				//
+				//	}
+				//}
+				//summ := summary.For(val)
+				//if summ.IfTainted != 0{
+				//
+				//}
+			}
+		}
+
+
+
 	case ssa.Value:
-		if v.alreadyTainted(val, tag) {
+		if v.alreadyTaintedWithTag(val, tag) {
 			return
 		}
 		v.taintVal(val, tag)
 		v.taintReferrers(i, tag)
 		//v.taintPointers(val,tag)
 	case *ssa.Store:
-		if v.alreadyTainted(val.Addr, tag) {
+		if v.alreadyTaintedWithTag(val.Addr, tag) {
 			return
 		}
 		v.taintVal(val.Addr, tag)
@@ -295,7 +317,7 @@ func (v *visitor) taintReferrers(i ssa.Instruction, tag string) {
 
 func (v *visitor) taintVal(val ssa.Value, tag string) {
 
-	if v.alreadyTainted(val, tag) {
+	if v.alreadyTaintedWithTag(val, tag) {
 		return
 	}
 	log.Debugf("taintval: %s, %s, tag:%s", val.Name(), val.String(), tag)
@@ -336,7 +358,7 @@ func (v *visitor) handleReturnValue(node *callgraph.Node, retInstr *ssa.Return) 
 	for _, result := range returnValues {
 		if tags, found := v.lattice[result]; found {
 			log.Debugf("lattice return value: %s", result.Name())
-			for tag, _ := range tags.hashset {
+			for tag, _ := range tags.msgSet {
 				for _, in := range ins {
 					callsite := in.Site
 					v.taint(callsite, tag)
@@ -347,7 +369,7 @@ func (v *visitor) handleReturnValue(node *callgraph.Node, retInstr *ssa.Return) 
 	}
 }
 
-func (v *visitor) alreadyTainted(val ssa.Value, tag string) bool {
+func (v *visitor) alreadyTaintedWithTag(val ssa.Value, tag string) bool {
 
 	if v.lattice[val] == nil {
 		return false
@@ -358,5 +380,15 @@ func (v *visitor) alreadyTainted(val ssa.Value, tag string) bool {
 	}
 
 	return true
+}
 
+
+func (v *visitor) alreadyTainted(val ssa.Value) bool {
+	tag,ok := v.lattice[val]
+
+	if tag == nil{
+		return false
+	}
+
+	return ok
 }
