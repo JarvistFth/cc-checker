@@ -2,6 +2,7 @@ package ssautils
 
 import (
 	"cc-checker/logger"
+	"cc-checker/utils"
 	"fmt"
 	"go/build"
 	"golang.org/x/tools/go/packages"
@@ -44,6 +45,14 @@ func MainPackages(pkgs []*ssa.Package) ([]*ssa.Package, error) {
 	}
 	if len(mains) == 0 {
 		return nil, fmt.Errorf("no main packages")
+	}
+
+	//check third-party pkg here
+	imports := mains[0].Pkg.Imports()
+	for _, imp := range imports{
+		if !utils.IsStdPkg(imp) && !utils.IsFabricPkg(imp){
+			log.Warningf("chaincode use third-party pkg here: %s", imp.String())
+		}
 	}
 	return mains, nil
 }

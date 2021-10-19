@@ -144,7 +144,9 @@ func (v *visitor) loopFunction(node *callgraph.Node) {
 				v.checkSource(instr)
 				v.checkSink(instr)
 
+
 				v.checkReadAfterWrite(instr)
+				v.checkRangeQueryAndCrossChannel(instr)
 
 				//taint val; we need to taint other call signatures
 				v.taintCallSigParams(instr)
@@ -191,6 +193,18 @@ func (v *visitor) checkReadAfterWrite(callInstr ssa.CallInstruction) {
 			parents: callInstr.Parent(),
 			key:     callInstr.Common().Args[0],
 		})
-
 	}
 }
+
+func (v *visitor) checkRangeQueryAndCrossChannel(callInstr ssa.CallInstruction) {
+	if ok := config.IsRangeQueryCall(callInstr); ok{
+		log.Warningf("range query photon reads here: %s, key:%s", prog.Fset.Position(callInstr.Pos()),callInstr.Common().Args[0].String())
+
+	}
+
+	if ok := config.IsCrossChannelCall(callInstr); ok{
+		log.Warningf("cross channel invoke here: %s, key:%s", prog.Fset.Position(callInstr.Pos()), callInstr.Common().Args[0].String())
+	}
+}
+
+

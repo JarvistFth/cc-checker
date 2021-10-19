@@ -64,6 +64,7 @@ func TestVisitor_Visit2(t *testing.T) {
 		log.Info(mainpkgs[0].String())
 	}
 	_, invokef := utils.FindInvokeMethod(prog, mainpkgs[0])
+
 	result = BuildCallGraph(mainpkgs,invokef)
 	for v,p := range result.Queries{
 		log.Debugf("val: %s=%s, ptr:%s", v.Name(),v.String(), p.PointsTo().String())

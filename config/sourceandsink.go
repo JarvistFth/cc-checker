@@ -40,6 +40,18 @@ type Reads struct {
 	Receiver string `json:"receiver"`
 }
 
+type CrossChannelApi struct {
+	Package  string `json:"package"`
+	Method   string `json:"method"`
+	Receiver string `json:"receiver"`
+}
+
+type RangeQueryApi struct {
+	Package  string `json:"package"`
+	Method   string `json:"method"`
+	Receiver string `json:"receiver"`
+}
+
 type Writes struct {
 	Package  string `json:"package"`
 	Method   string `json:"method"`
@@ -52,6 +64,8 @@ type Config struct {
 	Excludes []Exclude `json:"excludes"`
 	Reads	 []Reads   `json:"reads"`
 	Writes	 []Writes  `json:"writes"`
+	CrossChannelApis	[]CrossChannelApi `json:"cross_channel_apis"`
+	RangeQueryApis		[]RangeQueryApi	`json:"range_query_apis"`
 }
 
 func ReadConfig() (*Config, error) {
@@ -225,6 +239,60 @@ func IsCCWrite(call ssa.CallInstruction) bool {
 			path, recv, name := utils.DecomposeAbstractMethod(callcom)
 			//log.Debugf("sink invoke callee: %s, %s, %s", path, recv, name)
 			for _, s := range SSconfig.Writes {
+				if s.Package == path && s.Receiver == recv && s.Method == name {
+					return true
+				}
+			}
+		} else {
+			//dynamic call mode
+		}
+	}
+	return false
+}
+
+func IsCrossChannelCall(call ssa.CallInstruction) bool {
+	callcom := call.Common()
+	if fn := callcom.StaticCallee(); fn != nil {
+		path, recv, name := utils.DecomposeFunction(fn)
+		//log.Debugf("sink static callee: %s, %s, %s", path, recv, name)
+		for _, s := range SSconfig.CrossChannelApis {
+			if s.Package == path && s.Receiver == recv && s.Method == name {
+				return true
+			}
+		}
+	} else {
+		//invoke mode
+		if callcom.IsInvoke() {
+			path, recv, name := utils.DecomposeAbstractMethod(callcom)
+			//log.Debugf("sink invoke callee: %s, %s, %s", path, recv, name)
+			for _, s := range SSconfig.CrossChannelApis {
+				if s.Package == path && s.Receiver == recv && s.Method == name {
+					return true
+				}
+			}
+		} else {
+			//dynamic call mode
+		}
+	}
+	return false
+}
+
+func IsRangeQueryCall(call ssa.CallInstruction) bool {
+	callcom := call.Common()
+	if fn := callcom.StaticCallee(); fn != nil {
+		path, recv, name := utils.DecomposeFunction(fn)
+		//log.Debugf("sink static callee: %s, %s, %s", path, recv, name)
+		for _, s := range SSconfig.RangeQueryApis {
+			if s.Package == path && s.Receiver == recv && s.Method == name {
+				return true
+			}
+		}
+	} else {
+		//invoke mode
+		if callcom.IsInvoke() {
+			path, recv, name := utils.DecomposeAbstractMethod(callcom)
+			//log.Debugf("sink invoke callee: %s, %s, %s", path, recv, name)
+			for _, s := range SSconfig.RangeQueryApis {
 				if s.Package == path && s.Receiver == recv && s.Method == name {
 					return true
 				}

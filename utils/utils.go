@@ -212,6 +212,16 @@ func InStd(node *callgraph.Node) bool {
 	return pkg.Goroot
 }
 
+func IsStdPkg(pkg *types.Package) bool {
+	p, _ := build.Import(pkg.Path(), "", 0)
+	return p.Goroot
+}
+
+func IsFabricPkg(pkg *types.Package) bool {
+	return strings.Contains(pkg.Path(), "fabric")
+
+}
+
 func IsStdCall(ci ssa.CallInstruction) bool {
 	if ci.Value().Call.StaticCallee() == nil{
 		return false
