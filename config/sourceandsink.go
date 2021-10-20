@@ -91,7 +91,7 @@ func ReadConfig() (*Config, error) {
 func (c *Config) String() string {
 	var ret string
 	for _, s := range c.Sources {
-		ret += "sources:" + s.Package + "." + s.Method + " receiver:" + s.Receiver + s.Tag + "\n"
+		ret += "sources:" + s.Package + "." + s.Method + " receiver:" + s.Receiver + " tag:" + s.Tag + "\n"
 	}
 
 	for _, s := range c.Sinks {

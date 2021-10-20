@@ -46,7 +46,7 @@ func (v *visitor) Visit(node *callgraph.Node) {
 			v.seen[outputEdge.Callee] = true
 			continue
 		}
-		log.Infof("out: %s", outputEdge.Callee.String())
+		log.Infof("fn:%s -> out: %s", node.Func.Name(),outputEdge.Callee.String())
 
 		//根据当前的taint的情况，设定函数入参的lattice情况
 		v.Visit(outputEdge.Callee)

@@ -212,6 +212,7 @@ func InStd(node *callgraph.Node) bool {
 	return pkg.Goroot
 }
 
+
 func IsStdPkg(pkg *types.Package) bool {
 	p, _ := build.Import(pkg.Path(), "", 0)
 	return p.Goroot

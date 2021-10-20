@@ -53,7 +53,7 @@ func TestVisitor_Visit2(t *testing.T) {
 	}
 	log.Debug(cfg.String())
 	//prog, allpkgs, err = ssautils.BuildSSA("../ccs/hello/")
-	prog, allpkgs, err = ssautils.BuildSSA("../ccs/timerandomcc/")
+	prog, allpkgs, err = ssautils.BuildSSA("../ccs/raidneshcc/")
 	mainpkgs, err := ssautils.MainPackages(allpkgs)
 	if err != nil {
 		t.Fatalf(err.Error())
@@ -96,7 +96,7 @@ func TestVisitor_VisitMain(t *testing.T) {
 		log.Fatalf(err.Error())
 	}
 	log.Debug(cfg.String())
-	prog, allpkgs, err = ssautils.BuildSSA("../ccs/hello/")
+	prog, allpkgs, err = ssautils.BuildSSA("../ccs/rangecc/")
 	//prog, allpkgs, err = ssautils.BuildSSA("../ccs/timerandomcc/")
 	mainpkgs, err := ssautils.MainPackages(allpkgs)
 	if err != nil {

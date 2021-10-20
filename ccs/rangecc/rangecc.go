@@ -55,6 +55,7 @@ func (t *SimpleAsset) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 		err := stub.PutState(k, []byte(v))
 		if err != nil{
 			return shim.Error(err.Error())
+			//return shim.Error("err")
 		}
 
 
