@@ -1,9 +1,3 @@
-/*
- * Copyright IBM Corp All Rights Reserved
- *
- * SPDX-License-Identifier: Apache-2.0
- */
-
 package main
 
 import (
@@ -12,10 +6,19 @@ import (
 	"github.com/hyperledger/fabric/protos/peer"
 )
 
+/*
+ * Copyright IBM Corp All Rights Reserved
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+
 // SimpleAsset implements a simple chaincode to manage an asset
 type SimpleAsset struct {
 
 }
+
+var coName = "c1"
 
 // Init is called during chaincode instantiation to initialize any
 // data. Note that chaincode upgrade also calls this function to reset
@@ -43,14 +46,18 @@ func (t *SimpleAsset) Init(stub shim.ChaincodeStubInterface) peer.Response {
 func (t *SimpleAsset) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 	// Extract the function and args from the transaction proposal
 
-	err := stub.PutState("key1",[]byte("1"))
-	val,err := stub.GetState("key1")
 
+
+	fmt.Printf("%s", coName)
+	err := stub.PutState("m", []byte("v1"))
 	if err != nil{
 		return shim.Error("error")
+		//return shim.Error("err")
 	}
+
+
 	// Return the result as success payload
-	return shim.Success(val)
+	return shim.Success([]byte("success"))
 }
 
 // Set stores the asset (both key and value) on the ledger. If the key exists,

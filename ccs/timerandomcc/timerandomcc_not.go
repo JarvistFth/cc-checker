@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	"github.com/hyperledger/fabric/protos/peer"
+	"math/rand"
 )
 
 // SimpleAsset implements a simple chaincode to manage an asset
@@ -43,14 +44,19 @@ func (t *SimpleAsset) Init(stub shim.ChaincodeStubInterface) peer.Response {
 func (t *SimpleAsset) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 	// Extract the function and args from the transaction proposal
 
-	err := stub.PutState("key1",[]byte("1"))
-	val,err := stub.GetState("key1")
 
+	r := rand.Int()
+	fmt.Println(r)
+
+	err := stub.PutState("k1", []byte("v1"))
 	if err != nil{
 		return shim.Error("error")
+		//return shim.Error("err")
 	}
+
+
 	// Return the result as success payload
-	return shim.Success(val)
+	return shim.Success([]byte("success"))
 }
 
 // Set stores the asset (both key and value) on the ledger. If the key exists,
