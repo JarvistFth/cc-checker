@@ -53,7 +53,7 @@ func TestVisitor_Visit2(t *testing.T) {
 	}
 	log.Debug(cfg.String())
 	//prog, allpkgs, err = ssautils.BuildSSA("../ccs/hello/")
-	prog, allpkgs, err = ssautils.BuildSSA("../ccs/rangecc_not/")
+	prog, allpkgs, err = ssautils.BuildSSA("../ccs/smart-audit-publish/src/fabric/time")
 	mainpkgs, err := ssautils.MainPackages(allpkgs)
 	if err != nil {
 		t.Fatalf(err.Error())

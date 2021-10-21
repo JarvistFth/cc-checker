@@ -3,3 +3,5 @@ vendor/
 *.stat
 *.log
 debuglogs/
+.idea
+.DS_Store
