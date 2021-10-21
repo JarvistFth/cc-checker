@@ -1,14 +1,13 @@
 package core
 
 import (
-	"cc-checker/config"
-	"cc-checker/utils"
 	"fmt"
 	"golang.org/x/tools/go/callgraph"
 	"golang.org/x/tools/go/ssa"
 )
 
 func (v *visitor) taintCallSigParams(callInstr ssa.CallInstruction) {
+	log.Debugf("taint call sig params")
 	if callInstr.Common().StaticCallee() == nil{
 		return
 	}
@@ -30,33 +29,34 @@ func (v *visitor) taintCallSigParams(callInstr ssa.CallInstruction) {
 func (v *visitor) taint(i ssa.Instruction, tag string) {
 	switch val := i.(type) {
 	//todo: stdlib call function taint flow
-	case ssa.CallInstruction:
-		if _,yes := config.IsSource(val); yes{
-			if v.alreadyTaintedWithTag(val.(ssa.Value), tag) {
-				return
-			}
-			v.taintVal(val.(ssa.Value), tag)
-			v.taintReferrers(i, tag)
-		}else{
-			if yes := utils.IsStdCall(val); yes{
-				log.Debugf("stdcall: %s", val.String())
-				if v.alreadyTaintedWithTag(val.Value().Call.Value, tag) {
-					return
-				}
-				v.taintVal(val.Value().Call.Value, tag)
-				v.taintReferrers(i, tag)
-				//args := val.Value().Call.Args
-				//for _,arg := range args{
-				//	if v.alreadyTainted(arg){
-				//
-				//	}
-				//}
-				//summ := summary.For(val)
-				//if summ.IfTainted != 0{
-				//
-				//}
-			}
-		}
+	//case ssa.CallInstruction:
+		//v.taintCallSigParams(val)
+		//if _,yes := config.IsSource(val); yes{
+		//	if v.alreadyTaintedWithTag(val.(ssa.Value), tag) {
+		//		return
+		//	}
+		//	v.taintVal(val.(ssa.Value), tag)
+		//	v.taintReferrers(i, tag)
+		//}else{
+		//	if yes := utils.IsStdCall(val); yes{
+		//		log.Debugf("stdcall: %s", val.String())
+		//		if v.alreadyTaintedWithTag(val.Value().Call.Value, tag) {
+		//			return
+		//		}
+		//		v.taintVal(val.Value().Call.Value, tag)
+		//		v.taintReferrers(i, tag)
+		//		//args := val.Value().Call.Args
+		//		//for _,arg := range args{
+		//		//	if v.alreadyTainted(arg){
+		//		//
+		//		//	}
+		//		//}
+		//		//summ := summary.For(val)
+		//		//if summ.IfTainted != 0{
+		//		//
+		//		//}
+		//	}
+		//}
 
 
 
@@ -64,6 +64,7 @@ func (v *visitor) taint(i ssa.Instruction, tag string) {
 		if v.alreadyTaintedWithTag(val, tag) {
 			return
 		}
+
 		v.taintVal(val, tag)
 		v.taintReferrers(i, tag)
 		//v.taintPointers(val,tag)

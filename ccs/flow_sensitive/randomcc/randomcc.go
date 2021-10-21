@@ -1,4 +1,4 @@
-package randomcc
+package main
 
 import (
 	"fmt"

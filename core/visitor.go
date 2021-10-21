@@ -49,6 +49,7 @@ func (v *visitor) Visit(node *callgraph.Node) {
 		log.Infof("fn:%s -> out: %s", node.Func.Name(),outputEdge.Callee.String())
 
 		//根据当前的taint的情况，设定函数入参的lattice情况
+		v.taintCallSigParams(outputEdge.Site)
 		v.Visit(outputEdge.Callee)
 	}
 
