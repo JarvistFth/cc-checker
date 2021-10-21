@@ -1,0 +1,2 @@
+# fabric-chaincode-payment
+This is a simple chaincode where digital assets are transferred from account A to account B upon invoke. You can query how much assets an account has as well as paying salaries to an account.
