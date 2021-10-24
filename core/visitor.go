@@ -4,9 +4,11 @@ import (
 	"cc-checker/config"
 	"cc-checker/logger"
 	"cc-checker/utils"
+	"fmt"
 	"go/types"
 	"golang.org/x/tools/go/callgraph"
 	"golang.org/x/tools/go/ssa"
+	"os"
 )
 
 
@@ -185,6 +187,7 @@ func (v *visitor) checkReadAfterWrite(callInstr ssa.CallInstruction) {
 
 		if _,ok := v.rwMaps.Contains(callInstr); ok{
 			log.Warningf("read after write here:%s", prog.Fset.Position(callInstr.Pos()))
+			os.Stdout.WriteString(fmt.Sprintf("read after write here:%s", prog.Fset.Position(callInstr.Pos())))
 		}
 	}
 
@@ -200,11 +203,13 @@ func (v *visitor) checkReadAfterWrite(callInstr ssa.CallInstruction) {
 func (v *visitor) checkRangeQueryAndCrossChannel(callInstr ssa.CallInstruction) {
 	if ok := config.IsRangeQueryCall(callInstr); ok{
 		log.Warningf("range query photon reads here: %s, key:%s", prog.Fset.Position(callInstr.Pos()),callInstr.Common().Args[0].String())
+		os.Stdout.WriteString(fmt.Sprintf("range query photon reads here: %s, key:%s", prog.Fset.Position(callInstr.Pos()),callInstr.Common().Args[0].String()))
 
 	}
 
 	if ok := config.IsCrossChannelCall(callInstr); ok{
 		log.Warningf("cross channel invoke here: %s, key:%s", prog.Fset.Position(callInstr.Pos()), callInstr.Common().Args[0].String())
+		os.Stdout.WriteString(fmt.Sprintf("cross channel invoke here: %s, key:%s", prog.Fset.Position(callInstr.Pos()), callInstr.Common().Args[0].String()))
 	}
 }
 

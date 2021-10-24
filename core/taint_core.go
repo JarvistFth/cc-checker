@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"golang.org/x/tools/go/callgraph"
 	"golang.org/x/tools/go/ssa"
+	"os"
 )
 
 func (v *visitor) taintCallSigParams(callInstr ssa.CallInstruction) {
@@ -151,6 +152,9 @@ func (v *visitor) handleSinkDetection() bool {
 
 	for o,_ := range outputResult{
 		log.Warning(o)
+		//out("sink here", prog.Fset.Position())
+		os.Stdout.WriteString(o)
+		os.Stdout.WriteString("\n")
 	}
 
 	return false
