@@ -8,7 +8,6 @@ import (
 	"golang.org/x/tools/go/packages"
 	"golang.org/x/tools/go/ssa"
 	"golang.org/x/tools/go/ssa/ssautil"
-	"os"
 )
 
 var log = logger.GetLogger()
@@ -53,7 +52,7 @@ func MainPackages(pkgs []*ssa.Package) ([]*ssa.Package, error) {
 	for _, imp := range imports{
 		if !utils.IsStdPkg(imp) && !utils.IsFabricPkg(imp){
 			log.Warningf("chaincode use third-party pkg here: %s", imp.String())
-			os.Stdout.WriteString("chaincode use third-party pkg here: "+imp.String()+"\n")
+			//os.Stdout.WriteString("chaincode use third-party pkg here: "+imp.String()+"\n")
 
 		}
 	}

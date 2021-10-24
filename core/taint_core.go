@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"golang.org/x/tools/go/callgraph"
 	"golang.org/x/tools/go/ssa"
-	"os"
 )
 
 func (v *visitor) taintCallSigParams(callInstr ssa.CallInstruction) {
@@ -107,7 +106,7 @@ func (v *visitor) taintReferrers(i ssa.Instruction, tag string) {
 		}
 	} else if st, ok := i.(*ssa.Store); ok {
 		addr := st.Addr
-		log.Warningf("instr: %s is store instr", i.String())
+		log.Infof("instr: %s is store instr", i.String())
 		if addr.Referrers() == nil {
 			return
 		}
@@ -117,7 +116,7 @@ func (v *visitor) taintReferrers(i ssa.Instruction, tag string) {
 			v.taint(r, tag)
 		}
 	} else{
-		log.Warningf("instr: %s is not a value and store instr", i.String())
+		log.Errorf("instr: %s is not a value and store instr", i.String())
 	}
 
 }
@@ -153,8 +152,8 @@ func (v *visitor) handleSinkDetection() bool {
 	for o,_ := range outputResult{
 		log.Warning(o)
 		//out("sink here", prog.Fset.Position())
-		os.Stdout.WriteString(o)
-		os.Stdout.WriteString("\n")
+		//os.Stdout.WriteString(o)
+		//os.Stdout.WriteString("\n")
 	}
 
 	return false
