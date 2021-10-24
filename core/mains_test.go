@@ -5,7 +5,10 @@ import (
 	"cc-checker/logger"
 	ssautils "cc-checker/ssautils"
 	"cc-checker/utils"
+	"flag"
+	"fmt"
 	"golang.org/x/tools/go/ssa"
+	"testing"
 )
 
 func init() {
@@ -21,6 +24,13 @@ func init() {
 //	StartAnalysis(invokef)
 //
 //}
+
+func TestParseFlag(t *testing.T) {
+	ccsPath := flag.String("path","./","chaincode package path")
+	flag.Parse()
+
+	fmt.Println(*ccsPath)
+}
 
 func initial() *ssa.Function {
 	cfg, err := config.ReadConfig()
