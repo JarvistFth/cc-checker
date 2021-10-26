@@ -12,6 +12,20 @@ const (
 	emptyKeySubstitute    = "\x01"
 )
 
+func MockParams(fn string, args []string) (ret [][]byte){
+	byteParams := [][]byte{}
+
+	byteParams = append(byteParams, []byte(fn))
+	if len(args) > 0{
+		for _,arg := range args{
+			b := []byte(arg)
+			byteParams = append(byteParams,b)
+		}
+	}
+	return byteParams
+
+}
+
 func createCompositeKey(objectType string, attributes []string) (string, error) {
 	if err := validateCompositeKeyAttribute(objectType); err != nil {
 		return "", err
@@ -59,3 +73,4 @@ func validateSimpleKeys(simpleKeys ...string) error {
 	}
 	return nil
 }
+

@@ -22,6 +22,10 @@ func TestMockInvoke(t *testing.T) {
 
 	agent := dynamic.NewStubAgent ("cc",cc)
 
+	fn := "setWithRand"
+	args := []string{"aaa"}
+
+	b := dynamic.MockParams(fn,args)
 	//var strargs []string
 	//
 	//args := make([][]byte,len(strargs))
@@ -34,6 +38,6 @@ func TestMockInvoke(t *testing.T) {
 	//
 	//stub.MockInvoke(genUUID(),args)
 
-	agent.MockInvoke("123",[][]byte{[]byte("a")})
+	agent.MockInvoke("123",b)
 
 }
