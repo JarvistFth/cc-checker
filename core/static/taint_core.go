@@ -1,6 +1,7 @@
-package core
+package static
 
 import (
+	"cc-checker/core/common"
 	"fmt"
 	"golang.org/x/tools/go/callgraph"
 	"golang.org/x/tools/go/ssa"
@@ -17,7 +18,7 @@ func (v *visitor) taintCallSigParams(callInstr ssa.CallInstruction) {
 
 	for i,arg := range args{
 		if tags,ok := v.lattice[arg];ok{
-			for tag,_ := range tags.msgSet {
+			for tag,_ := range tags.MsgSet {
 				v.taintVal(params[i],tag)
 				log.Infof("fn:%s, taint params:%s=%s", fn.Name(), arg.Name(),arg.String())
 			}
@@ -128,7 +129,7 @@ func (v *visitor) taintVal(val ssa.Value, tag string) {
 	}
 	log.Debugf("taintval: %s, %s, tag:%s", val.Name(), val.String(), tag)
 	if v.lattice[val] == nil {
-		v.lattice[val] = new(LatticeTag)
+		v.lattice[val] = new(common.LatticeTag)
 	}
 	v.lattice[val].Add(tag)
 }
@@ -141,7 +142,7 @@ func (v *visitor) handleSinkDetection() bool {
 			log.Debugf("sink arg: %s=%s", arg.Name(),arg.String())
 			if tags, ok := v.lattice[arg]; ok {
 				//todo: report detection
-				output := fmt.Sprintf("sink here %s with tag:%s ",prog.Fset.Position(callInstr.Pos()),tags.String())
+				output := fmt.Sprintf("sink here %s with tag:%s ", prog.Fset.Position(callInstr.Pos()),tags.String())
 				outputResult[output] = true
 				//return true
 			}
@@ -149,7 +150,7 @@ func (v *visitor) handleSinkDetection() bool {
 
 	}
 
-	for o,_ := range outputResult{
+	for o,_ := range outputResult {
 		log.Warning(o)
 		//out("sink here", prog.Fset.Position())
 		//os.Stdout.WriteString(o)
@@ -167,7 +168,7 @@ func (v *visitor) handleReturnValue(node *callgraph.Node, retInstr *ssa.Return) 
 	for _, result := range returnValues {
 		if tags, found := v.lattice[result]; found {
 			log.Debugf("lattice return value: %s", result.Name())
-			for tag, _ := range tags.msgSet {
+			for tag, _ := range tags.MsgSet {
 				for _, in := range ins {
 					callsite := in.Site
 					v.taint(callsite, tag)

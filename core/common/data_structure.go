@@ -1,4 +1,4 @@
-package core
+package common
 
 import (
 	"cc-checker/logger"
@@ -41,8 +41,8 @@ func (m SinkCallArgsMap) Put(key ssa.CallInstruction, val ssa.Value) {
 }
 
 type RwDetails struct {
-	parents *ssa.Function
-	key		ssa.Value
+	Parents *ssa.Function
+	Key     ssa.Value
 }
 
 type ReadAfterWriteMap map[ssa.CallInstruction]RwDetails
@@ -63,31 +63,31 @@ func (m ReadAfterWriteMap) Contains(c ssa.CallInstruction) (rw RwDetails, ok boo
 }
 
 type LatticeTag struct {
-	tag    string
-	msgSet map[string]bool
+	Tag    string
+	MsgSet map[string]bool
 }
 
 func (t *LatticeTag) Add(tag string) {
-	if t.msgSet == nil{
-		t.msgSet = make(map[string]bool)
+	if t.MsgSet == nil{
+		t.MsgSet = make(map[string]bool)
 	}
-	if _,ok := t.msgSet[tag];ok{
+	if _,ok := t.MsgSet[tag];ok{
 		return
 	}
 
-	t.tag += tag + " | "
-	t.msgSet[tag] = true
+	t.Tag += tag + " | "
+	t.MsgSet[tag] = true
 }
 
 func (t *LatticeTag) Contains(tag string) bool {
-	_,ok :=t.msgSet[tag]
+	_,ok :=t.MsgSet[tag]
 	return ok
 }
 
 func (t *LatticeTag) Delete(tag string) {
-	delete(t.msgSet,tag)
+	delete(t.MsgSet,tag)
 }
 
 func (t *LatticeTag) String() string {
-	return t.tag
+	return t.Tag
 }

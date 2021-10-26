@@ -1,9 +1,13 @@
-package core
+package static
 
 import (
 	summary "cc-checker/core/stdlib"
+	"cc-checker/logger"
 	"golang.org/x/tools/go/ssa"
 )
+
+ var log = logger.GetLogger()
+
 
 //func isSink(call ssa.CallInstruction) bool{
 //

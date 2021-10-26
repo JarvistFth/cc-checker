@@ -1,7 +1,8 @@
-package core
+package static
 
 import (
 	"cc-checker/config"
+	"cc-checker/core/common"
 	"cc-checker/logger"
 	"cc-checker/utils"
 	"go/types"
@@ -12,22 +13,22 @@ import (
 
 
 type visitor struct {
-	lattice  map[ssa.Value]*LatticeTag
-	seen     map[*callgraph.Node]bool
-	sinkArgs SinkCallArgsMap
-	rwMaps	 ReadAfterWriteMap
-	latticeSigParams map[*ssa.Function][]*LatticeTag
-	ptrs AddrMap
+	lattice          map[ssa.Value]*common.LatticeTag
+	seen             map[*callgraph.Node]bool
+	sinkArgs         common.SinkCallArgsMap
+	rwMaps           common.ReadAfterWriteMap
+	latticeSigParams map[*ssa.Function][]*common.LatticeTag
+	ptrs             common.AddrMap
 }
 
 func NewVisitor() *visitor {
 	return &visitor{
-		seen:     make(map[*callgraph.Node]bool),
-		lattice:  make(map[ssa.Value]*LatticeTag),
-		sinkArgs: map[ssa.CallInstruction]map[ssa.Value]bool{},
-		rwMaps: ReadAfterWriteMap{},
-		latticeSigParams: make(map[*ssa.Function][]*LatticeTag),
-		ptrs: map[ssa.Value]map[ssa.Value]bool{},
+		seen:             make(map[*callgraph.Node]bool),
+		lattice:          make(map[ssa.Value]*common.LatticeTag),
+		sinkArgs:         map[ssa.CallInstruction]map[ssa.Value]bool{},
+		rwMaps:           common.ReadAfterWriteMap{},
+		latticeSigParams: make(map[*ssa.Function][]*common.LatticeTag),
+		ptrs:             map[ssa.Value]map[ssa.Value]bool{},
 	}
 }
 
@@ -95,7 +96,7 @@ func (v *visitor) loopFunction(node *callgraph.Node) {
 			}
 
 			for _,ref := range *param.Referrers(){
-				for tag,_ := range tags.msgSet {
+				for tag,_ := range tags.MsgSet {
 					v.taint(ref,tag)
 				}
 			}
@@ -109,7 +110,7 @@ func (v *visitor) loopFunction(node *callgraph.Node) {
 			switch instr := i.(type) {
 			case *ssa.UnOp:
 				if _,ok := instr.X.(*ssa.Global); ok{
-					log.Warningf("unop global variable here %s", prog.Fset.Position(i.Pos()))
+					//log.Warningf("unop global variable here %s", prog.Fset.Position(i.Pos()))
 					v.taint(i,"use global variable")
 				}
 			case *ssa.FieldAddr:
@@ -117,7 +118,7 @@ func (v *visitor) loopFunction(node *callgraph.Node) {
 				log.Debugf("put FieldAddr %p", addr)
 				v.ptrs.Put(i.(ssa.Value),instr.X)
 				if tags,ok := v.lattice[addr];ok{
-					for tag,_ := range tags.msgSet {
+					for tag,_ := range tags.MsgSet {
 						v.taintPointers(addr,tag)
 					}
 				}
@@ -129,7 +130,7 @@ func (v *visitor) loopFunction(node *callgraph.Node) {
 				log.Debugf("put IndexAddr %p", addr)
 				v.ptrs.Put(addr,instr.X)
 				if tags,ok := v.lattice[addr];ok{
-					for tag,_ := range tags.msgSet {
+					for tag,_ := range tags.MsgSet {
 						v.taintPointers(addr,tag)
 					}
 				}
@@ -191,9 +192,9 @@ func (v *visitor) checkReadAfterWrite(callInstr ssa.CallInstruction) {
 
 	if ok := config.IsCCWrite(callInstr); ok{
 		log.Infof("chaincode writes stub here: %s, key:%s", prog.Fset.Position(callInstr.Pos()), callInstr.Common().Args[0].String())
-		v.rwMaps.Put(callInstr,RwDetails{
-			parents: callInstr.Parent(),
-			key:     callInstr.Common().Args[0],
+		v.rwMaps.Put(callInstr, common.RwDetails{
+			Parents: callInstr.Parent(),
+			Key:     callInstr.Common().Args[0],
 		})
 	}
 }

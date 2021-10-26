@@ -1,4 +1,4 @@
-package core
+package static
 
 import (
 	"golang.org/x/tools/go/callgraph"

@@ -32,6 +32,7 @@ require (
 	github.com/netkiller/chaincode v0.0.0-20210111085901-74f904cf7d90
 	github.com/nmatsui/fabric-payment-sample-chaincode v0.0.0-20180309055244-fa6a194dc6e6
 	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/satori/go.uuid v1.2.0
 )
 

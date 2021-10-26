@@ -1,7 +1,9 @@
 package main
 
-import "cc-checker/core"
+import (
+	"cc-checker/core/static"
+)
 
 func main() {
-	core.Main()
+	static.Main()
 }
