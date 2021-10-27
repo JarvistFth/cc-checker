@@ -10,7 +10,7 @@ import (
 )
 
 type StubAgent struct {
-	MockStub
+	 MockStub
 }
 
 func NewStubAgent(name string, cc shim.Chaincode) *StubAgent {
@@ -84,6 +84,38 @@ func (stub *StubAgent) PutState(key string, value []byte) error {
 	return nil
 }
 
+func (stub *StubAgent) MockInit(uuid string, args [][]byte) pb.Response {
+	stub.Args = args
+	stub.MockTransactionStart(uuid)
+	res := stub.CC.Init(stub)
+	stub.MockTransactionEnd(uuid)
+	return res
+}
+
+func (stub StubAgent) InvokeChaincode(chaincodeName string, args [][]byte, channel string) pb.Response {
+
+	if channel != "" {
+		chaincodeName = chaincodeName + "/" + channel
+	}
+	// TODO "Args" here should possibly be a serialized pb.ChaincodeInput
+	otherStub := stub.Invokables[chaincodeName]
+	log.Debug("MockStub", stub.Name, "Invoking peer chaincode", otherStub.Name, args)
+	//	function, strings := getFuncArgs(Args)
+	res := otherStub.MockInvoke(stub.TxID, args)
+	log.Debug("MockStub", stub.Name, "Invoked peer chaincode", otherStub.Name, "got", fmt.Sprintf("%+v", res))
+	return res
+}
+
+// Invoke this chaincode, also starts and ends a transaction.
+func (stub *StubAgent) MockInvoke(uuid string, args [][]byte) pb.Response {
+	stub.Args = args
+	stub.MockTransactionStart(uuid)
+	res := stub.CC.Invoke(stub)
+	stub.MockTransactionEnd(uuid)
+	return res
+
+
+}
 
 
 

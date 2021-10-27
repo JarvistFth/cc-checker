@@ -25,6 +25,10 @@ func BuildSSA(path string) (*ssa.Program, []*ssa.Package, error) {
 		return nil, nil, nil
 	}
 	prog, pkgs := ssautil.AllPackages(initial, 0)
+
+
+	checkAst(prog.Fset, initial[0].Syntax[0], initial[0].TypesInfo)
+
 	prog.Build()
 	//mainpkg, err := MainPackages(pkgs)
 
@@ -56,5 +60,6 @@ func MainPackages(pkgs []*ssa.Package) ([]*ssa.Package, error) {
 
 		}
 	}
+
 	return mains, nil
 }
