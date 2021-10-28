@@ -16,6 +16,10 @@ func CheckNonDitermined(cc shim.Chaincode, fn string, args []string) {
 		
 		agent.MockInvoke(genUUID(),b)
 	}
+
+	if !ConflictMap.IsDetermined(){
+		log.Warning("Non-determined risk detect here!!")
+	}
 }
 
 func CheckOtherRules(cc shim.Chaincode, fn string, args []string) {

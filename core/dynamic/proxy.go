@@ -6,20 +6,36 @@ import (
 	"fmt"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	pb "github.com/hyperledger/fabric/protos/peer"
+	"reflect"
 	"strings"
 )
 
-var ConflictMap map[string]string
 
+type StubStates map[*StubAgent]map[string][]byte
+
+var ConflictMap StubStates
+var StubAgents []*StubAgent
+
+func (s StubStates) IsDetermined() bool{
+	for i,stubi := range StubAgents{
+		for j,stubj := range StubAgents{
+			if i != j{
+				if !reflect.DeepEqual(s[stubi],s[stubj]){
+					return false
+				}
+			}
+		}
+	}
+	return true
+}
 
 type StubAgent struct {
 	 MockStub
-
 	 RWSet map[string]bool
 }
 
 func init() {
-	ConflictMap = make(map[string]string)
+	ConflictMap = make(map[*StubAgent]map[string][]byte)
 }
 
 func NewStubAgent(name string, cc shim.Chaincode) *StubAgent {
@@ -38,6 +54,7 @@ func NewStubAgent(name string, cc shim.Chaincode) *StubAgent {
 	//	ConflictMap = make(map[string]string)
 	//}
 	s.RWSet = make(map[string]bool)
+	StubAgents = append(StubAgents,s)
 	return s
 }
 
@@ -64,17 +81,10 @@ func (stub *StubAgent) PutState(key string, value []byte) error {
 		return stub.DelState(key)
 	}
 
-	log.Debug("MockStub", stub.Name, "Putting", key, value)
+	log.Debug("MockStub", stub.Name, "Putting", key, string(value))
 	stub.State[key] = value
 	stub.RWSet[key] = true
-
-	if val,ok := ConflictMap[key]; !ok{
-		ConflictMap[key] = string(value)
-	}else{
-		if val != string(value){
-			log.Warning("Non-Determined")
-		}
-	}
+	ConflictMap[stub] = stub.State
 
 
 

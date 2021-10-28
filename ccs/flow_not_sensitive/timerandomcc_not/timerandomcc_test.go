@@ -25,7 +25,7 @@ func TestMockInvoke(t *testing.T) {
 	//st.GetState()
 
 	//st.MockInvoke("1",)
-	dynamic.CheckNonDitermined(cc,"setWithRand",[]string{"asd","bcd"})
-	dynamic.CheckOtherRules(cc, "setWithRand",[]string{"1","2"})
+	dynamic.CheckNonDitermined(cc,"setWithTime",[]string{"asd","bcd"})
+	dynamic.CheckOtherRules(cc, "setWithTime",[]string{"1","2"})
 
 }
