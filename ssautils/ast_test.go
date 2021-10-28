@@ -8,7 +8,7 @@ import (
 )
 
 func TestUnhandledError(t *testing.T) {
-	path := "../ccs/timerandomcc/"
+	path := "../ccs/flow_not_sensitive/timerandomcc"
 	ssacfg := &packages.Config{
 		Mode: packages.LoadAllSyntax,
 		Dir:  path,

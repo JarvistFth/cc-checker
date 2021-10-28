@@ -11,14 +11,15 @@ import (
 
 var ConflictMap map[string]string
 
-func init() {
-	ConflictMap = make(map[string]string)
-}
 
 type StubAgent struct {
 	 MockStub
 
 	 RWSet map[string]bool
+}
+
+func init() {
+	ConflictMap = make(map[string]string)
 }
 
 func NewStubAgent(name string, cc shim.Chaincode) *StubAgent {
@@ -33,6 +34,10 @@ func NewStubAgent(name string, cc shim.Chaincode) *StubAgent {
 	s.Keys = list.New()
 	s.ChaincodeEventsChannel = make(chan *pb.ChaincodeEvent, 100) //define large capacity for non-blocking setEvent calls.
 	s.Decorations = make(map[string][]byte)
+	//if ConflictMap == nil{
+	//	ConflictMap = make(map[string]string)
+	//}
+	s.RWSet = make(map[string]bool)
 	return s
 }
 

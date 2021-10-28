@@ -8,9 +8,6 @@ import (
 var log = logger.GetLogger()
 
 func CheckNonDitermined(cc shim.Chaincode, fn string, args []string) {
-	
-	
-	
 	b := MockParams(fn,args)
 	var agents []*StubAgent
 	for i:=0; i<10; i++{
