@@ -1,8 +1,8 @@
 package dummy
 
 import (
-	"cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/contract"
-	"cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/oracles/location/service"
+	contract2 "cc-checker/ccs/normal/smart-audit-publish/src/core/contract"
+	"cc-checker/ccs/normal/smart-audit-publish/src/oracles/location/service"
 	"errors"
 	"math"
 	"strings"
@@ -19,8 +19,8 @@ var (
 
 // 这里模拟在预言机服务上的单个规则结构
 type RuleItem struct {
-	Logic     contract.LogicOperator
-	Condition contract.ConditionalOperator
+	Logic     contract2.LogicOperator
+	Condition contract2.ConditionalOperator
 	Params    []string
 }
 
@@ -33,7 +33,7 @@ type LocationValidation struct {
 }
 
 // 模拟验证位置规则
-func (t *LocationValidation) Validate(id contract.ServiceRuleID, args []string) error {
+func (t *LocationValidation) Validate(id contract2.ServiceRuleID, args []string) error {
 	if len(args) < 1 {
 		return errors.New("地理位置解析需要的参数不足")
 	}
@@ -79,8 +79,8 @@ func initValidationRule() *ServiceRules {
 	return &ServiceRules{
 		Rules: []RuleItem{
 			{
-				Logic:     contract.NONE,
-				Condition: contract.IN,
+				Logic:     contract2.NONE,
+				Condition: contract2.IN,
 				Params:    []string{"39.9", "116.3", "1000"},
 			},
 		},

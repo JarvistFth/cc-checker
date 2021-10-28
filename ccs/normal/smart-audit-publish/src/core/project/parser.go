@@ -1,11 +1,11 @@
 package project
 
 import (
-	common2 "cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/common"
-	"cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/contract"
-	orgnization2 "cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/orgnization"
-	"cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/record"
-	"cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/rules"
+	"cc-checker/ccs/normal/smart-audit-publish/src/core/common"
+	"cc-checker/ccs/normal/smart-audit-publish/src/core/contract"
+	"cc-checker/ccs/normal/smart-audit-publish/src/core/orgnization"
+	"cc-checker/ccs/normal/smart-audit-publish/src/core/record"
+	"cc-checker/ccs/normal/smart-audit-publish/src/core/rules"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -148,8 +148,8 @@ func setEventRelatedInformation(registration *Registration, auditeeID uint32,
 }
 
 // 根据审计当事人ID获取审计当事人信息
-func getAuditee(auditeeID uint32, context contract.Context) (*orgnization2.Auditee, error) {
-	auditee := orgnization2.Auditee{Member: &orgnization2.Member{ID: auditeeID}}
+func getAuditee(auditeeID uint32, context contract.Context) (*orgnization.Auditee, error) {
+	auditee := orgnization.Auditee{Member: &orgnization.Member{ID: auditeeID}}
 	auditeeBuf, err := context.GetState(auditee.Key())
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("获取审计当事人信息出错，详细信息：%s", err.Error()))
@@ -175,7 +175,7 @@ func getProject(projectID uint32, context contract.Context) (*Project, error) {
 }
 
 // 根据传入的参数获取审计事件ID
-func GetEventID(args []string, context contract.Context) (*common2.Uint256, error) {
+func GetEventID(args []string, context contract.Context) (*common.Uint256, error) {
 
 	auditeeID, err := strconv.ParseUint(args[0], 10, 32)
 	if err != nil {
@@ -192,33 +192,33 @@ func GetEventID(args []string, context contract.Context) (*common2.Uint256, erro
 		return nil, errors.New(fmt.Sprintf("解析审计事件对应规则ID出错，详细信息：%s", err.Error()))
 	}
 
-	u32AuditeeID := common2.Uint32ToBytes(uint32(auditeeID))
-	u32ProjectID := common2.Uint32ToBytes(uint32(projectID))
-	u32RuleID := common2.Uint32ToBytes(ruleID)
+	u32AuditeeID := common.Uint32ToBytes(uint32(auditeeID))
+	u32ProjectID := common.Uint32ToBytes(uint32(projectID))
+	u32RuleID := common.Uint32ToBytes(ruleID)
 
 	ids := append(append(append(
 		[]byte{}, u32AuditeeID[:]...), u32ProjectID[:]...), u32RuleID[:]...)
-	var eventID common2.Uint256
+	var eventID common.Uint256
 	copy(eventID[:], ids)
 
 	return &eventID, nil
 }
 
 // 根据传入的参数获取审计事件ID
-func GenerateEventID(auditeeID, projectID, ruleID uint32) common2.Uint256 {
-	u32AuditeeID := common2.Uint32ToBytes(auditeeID)
-	u32ProjectID := common2.Uint32ToBytes(projectID)
-	u32RuleID := common2.Uint32ToBytes(ruleID)
+func GenerateEventID(auditeeID, projectID, ruleID uint32) common.Uint256 {
+	u32AuditeeID := common.Uint32ToBytes(auditeeID)
+	u32ProjectID := common.Uint32ToBytes(projectID)
+	u32RuleID := common.Uint32ToBytes(ruleID)
 
 	ids := append(append(append(
 		[]byte{}, u32AuditeeID[:]...), u32ProjectID[:]...), u32RuleID[:]...)
-	var eventID common2.Uint256
+	var eventID common.Uint256
 	copy(eventID[:], ids)
 	return eventID
 }
 
 // 获取当前存储的审计事件计数
-func GetRegistrationCountKey(specID common2.Uint256) string {
+func GetRegistrationCountKey(specID common.Uint256) string {
 	return specID.String() + RegistrationCountKeySuffix
 }
 
@@ -262,7 +262,7 @@ func getProjectObject(projectID uint32, context contract.Context) (*Project, err
 
 // 通过审计当事人ID生成相应的ID值
 func getAuditeeKeyFromID(auditeeID uint32, context contract.Context) (string, error) {
-	auditee := orgnization2.Auditee{Member: &orgnization2.Member{ID: uint32(auditeeID)}}
+	auditee := orgnization.Auditee{Member: &orgnization.Member{ID: uint32(auditeeID)}}
 	auditBytes, err := context.GetState(auditee.Key())
 	if err != nil {
 		return "", errors.New(fmt.Sprintf("不存在审计当事人ID对应的审计当事人"))

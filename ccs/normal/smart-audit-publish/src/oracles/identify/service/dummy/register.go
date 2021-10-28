@@ -1,7 +1,7 @@
 package dummy
 
 import (
-	"cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/contract"
+	"cc-checker/ccs/normal/smart-audit-publish/src/core/contract"
 )
 
 type EntityIdentifyRegistration struct {

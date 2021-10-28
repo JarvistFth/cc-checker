@@ -1,7 +1,7 @@
 package dummy
 
 import (
-	"cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/contract"
+	contract2 "cc-checker/ccs/normal/smart-audit-publish/src/core/contract"
 	"errors"
 	"strconv"
 	"time"
@@ -17,8 +17,8 @@ var (
 
 // 这里模拟在预言机服务上的单个规则结构
 type RuleItem struct {
-	Logic     contract.LogicOperator
-	Condition contract.ConditionalOperator
+	Logic     contract2.LogicOperator
+	Condition contract2.ConditionalOperator
 	Params    []string
 }
 
@@ -31,7 +31,7 @@ type TimeValidation struct {
 }
 
 // 模拟验证时间是否满足规则要求
-func (t *TimeValidation) Validate(id contract.ServiceRuleID, args []string) error {
+func (t *TimeValidation) Validate(id contract2.ServiceRuleID, args []string) error {
 	if len(args) == 0 {
 		return errors.New("不允许没有参数的验证")
 	}
@@ -68,13 +68,13 @@ func initValidationRule() *ServiceRules {
 	return &ServiceRules{
 		Rules: []RuleItem{
 			{
-				Logic:     contract.AND,
-				Condition: contract.GE,
+				Logic:     contract2.AND,
+				Condition: contract2.GE,
 				Params:    []string{"9"},
 			},
 			{
-				Logic:     contract.AND,
-				Condition: contract.LE,
+				Logic:     contract2.AND,
+				Condition: contract2.LE,
 				Params:    []string{"18"},
 			},
 		},

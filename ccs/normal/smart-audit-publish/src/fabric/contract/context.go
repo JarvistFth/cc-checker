@@ -1,7 +1,7 @@
 package contract
 
 import (
-	contract2 "cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/contract"
+	"cc-checker/ccs/normal/smart-audit-publish/src/core/contract"
 	"errors"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
@@ -40,7 +40,7 @@ func (c *ContextImpl) DeleteState(key string) error {
 }
 
 // 根据起始Key值及结束Key值，查询所有满足条件的值，返回迭代器
-func (c *ContextImpl) GetStateByRange(startKey, endKey string) (contract2.Iterator, error) {
+func (c *ContextImpl) GetStateByRange(startKey, endKey string) (contract.Iterator, error) {
 	raw, err := c.stub.GetStateByRange(startKey, endKey)
 	if err != nil {
 		return nil, err
@@ -49,7 +49,7 @@ func (c *ContextImpl) GetStateByRange(startKey, endKey string) (contract2.Iterat
 }
 
 // 根据合约名、方法名及输入参数调用合约
-func (c *ContextImpl) InvokeContract(name, function string, args []string) contract2.Response {
+func (c *ContextImpl) InvokeContract(name, function string, args []string) contract.Response {
 	fabricArgs := [][]byte{
 		[]byte(function),
 	}
@@ -58,7 +58,7 @@ func (c *ContextImpl) InvokeContract(name, function string, args []string) contr
 	}
 	// 这里channel参数为空则默认会发送到当前合约所在channel上
 	rtn := c.stub.InvokeChaincode(name, fabricArgs, "")
-	response := contract2.Response{
+	response := contract.Response{
 		Payload: rtn.Payload,
 	}
 	if rtn.Status != shim.OK {

@@ -1,9 +1,9 @@
 package main
 
 import (
-	core "cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/contract"
-	contract2 "cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/fabric/contract"
-	invokes2 "cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/oracles/identify/invokes"
+	core "cc-checker/ccs/normal/smart-audit-publish/src/core/contract"
+	"cc-checker/ccs/normal/smart-audit-publish/src/fabric/contract"
+	"cc-checker/ccs/normal/smart-audit-publish/src/oracles/identify/invokes"
 	"fmt"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	"github.com/hyperledger/fabric/protos/peer"
@@ -22,16 +22,16 @@ func (s *IdentifyService) Init(stub shim.ChaincodeStubInterface) peer.Response {
 
 // 物体识别合约方法调用
 func (s *IdentifyService) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
-	context := contract2.NewContext(stub)
+	context := contract.NewContext(stub)
 	args := context.GetArgs()
 
 	switch context.GetFunctionName() {
 	// 注册物体规则
 	case core.RegisterFunctionName:
-		return contract2.Response(invokes2.RegisterMain(args, context))
+		return contract.Response(invokes.RegisterMain(args, context))
 	// 物体验证
 	case core.ValidationFunctionName:
-		return contract2.Response(invokes2.ValidateMain(args))
+		return contract.Response(invokes.ValidateMain(args))
 	default:
 		return shim.Error(fmt.Sprintf("找不到名为%s的方法，调用失败",
 			context.GetFunctionName()))

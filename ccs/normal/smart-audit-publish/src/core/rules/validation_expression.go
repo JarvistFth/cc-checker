@@ -1,7 +1,7 @@
 package rules
 
 import (
-	contract2 "cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/contract"
+	"cc-checker/ccs/normal/smart-audit-publish/src/core/contract"
 	"fmt"
 	"strconv"
 )
@@ -14,7 +14,7 @@ type ValidationExpression struct {
 	Expression string
 }
 
-func RegisterRules(expression []string, context contract2.Context) (uint32, error) {
+func RegisterRules(expression []string, context contract.Context) (uint32, error) {
 	op, expressions, err := Parse(expression)
 	if err != nil {
 		return 0, err
@@ -22,7 +22,7 @@ func RegisterRules(expression []string, context contract2.Context) (uint32, erro
 
 	relation := &ValidationRelationship{
 		Operator: op,
-		Rules:    make(map[RuleType]contract2.ServiceRuleID, 0),
+		Rules:    make(map[RuleType]contract.ServiceRuleID, 0),
 	}
 	for _, v := range expressions {
 		ruleID, err := v.registerRule(context)
@@ -37,7 +37,7 @@ func RegisterRules(expression []string, context contract2.Context) (uint32, erro
 }
 
 func (r *ValidationExpression) registerRule(
-	context contract2.Context) (contract2.ServiceRuleID, error) {
+	context contract.Context) (contract.ServiceRuleID, error) {
 	switch r.Type {
 	case Time, Location, FaceRecognize, ObjectRecognize:
 		return r.registerFromContract(string(r.Type), context)
@@ -47,12 +47,12 @@ func (r *ValidationExpression) registerRule(
 }
 
 func (r *ValidationExpression) registerFromContract(contractName string,
-	context contract2.Context) (contract2.ServiceRuleID, error) {
+	context contract.Context) (contract.ServiceRuleID, error) {
 	args := []string{
 		r.Expression,
 	}
 
-	rtn := context.InvokeContract(contractName, contract2.RegisterFunctionName, args)
+	rtn := context.InvokeContract(contractName, contract.RegisterFunctionName, args)
 	if rtn.Err != nil {
 		return 0, rtn.Err
 	}
@@ -62,5 +62,5 @@ func (r *ValidationExpression) registerFromContract(contractName string,
 		return 0, err
 	}
 
-	return contract2.ServiceRuleID(id), nil
+	return contract.ServiceRuleID(id), nil
 }

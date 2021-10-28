@@ -1,8 +1,8 @@
 package dummy
 
 import (
-	"cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/contract"
-	"cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/oracles/face/service"
+	"cc-checker/ccs/normal/smart-audit-publish/src/core/contract"
+	"cc-checker/ccs/normal/smart-audit-publish/src/oracles/face/service"
 	"crypto/rand"
 	"errors"
 	mrand "math/rand"

@@ -1,7 +1,7 @@
 package record
 
 import (
-	"cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/contract"
+	"cc-checker/ccs/normal/smart-audit-publish/src/core/contract"
 )
 
 // 用于抽象一条记录的信息

@@ -1,8 +1,8 @@
 package rules
 
 import (
-	contract2 "cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/contract"
-	record2 "cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/record"
+	"cc-checker/ccs/normal/smart-audit-publish/src/core/contract"
+	"cc-checker/ccs/normal/smart-audit-publish/src/core/record"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -16,10 +16,10 @@ const (
 
 type ValidationRelationship struct {
 	// 逻辑操作符
-	Operator contract2.LogicOperator
+	Operator contract.LogicOperator
 
 	// 用于记录一组规则，Key值对应一个规则类型，Value值为注册规则表达式时预言机服务返回的相应的ID值
-	Rules map[RuleType]contract2.ServiceRuleID
+	Rules map[RuleType]contract.ServiceRuleID
 
 	// 规则唯一标识
 	ID uint32
@@ -47,17 +47,17 @@ func (v *ValidationRelationship) Value() ([]byte, error) {
 }
 
 func registerValidationRelationship(p *ValidationRelationship,
-	context contract2.Context) (uint32, error) {
-	count, err := record2.GetRecordCount(ruleCountKey, context)
+	context contract.Context) (uint32, error) {
+	count, err := record.GetRecordCount(ruleCountKey, context)
 	if err != nil {
 		return 0, err
 	}
 	p.ID = count
 
-	if err := record2.StoreItem(p, context); err != nil {
+	if err := record.StoreItem(p, context); err != nil {
 		return 0, fmt.Errorf("审计业务%s存储失败，详细信息：%s", p.Key(), err)
 	}
-	if err := record2.StoreCount(p, context); err != nil {
+	if err := record.StoreCount(p, context); err != nil {
 		return 0, fmt.Errorf("审计业务%s相应的索引值存储失败，详细信息：%s",
 			p.Key(), err)
 	}
