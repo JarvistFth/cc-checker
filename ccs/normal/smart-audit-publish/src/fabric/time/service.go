@@ -1,9 +1,9 @@
 package main
 
 import (
-	core "cc-checker/ccs/normal/smart-audit-publish/src/core/contract"
-	contract2 "cc-checker/ccs/normal/smart-audit-publish/src/fabric/contract"
-	invokes2 "cc-checker/ccs/normal/smart-audit-publish/src/oracles/time/invokes"
+	core "cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/contract"
+	contract2 "cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/fabric/contract"
+	invokes2 "cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/oracles/time/invokes"
 	"fmt"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	"github.com/hyperledger/fabric/protos/peer"

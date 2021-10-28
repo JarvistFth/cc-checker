@@ -1,8 +1,8 @@
 package invokes
 
 import (
-	"cc-checker/ccs/normal/smart-audit-publish/src/core/contract"
-	"cc-checker/ccs/normal/smart-audit-publish/src/oracles/identify/service/dummy"
+	"cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/contract"
+	"cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/oracles/identify/service/dummy"
 	"strconv"
 )
 

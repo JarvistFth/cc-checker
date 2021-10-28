@@ -1,8 +1,8 @@
 package orgnization
 
 import (
-	"cc-checker/ccs/normal/smart-audit-publish/src/core/contract"
-	"cc-checker/ccs/normal/smart-audit-publish/src/core/record"
+	"cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/contract"
+	"cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/record"
 )
 
 const (

@@ -2,13 +2,13 @@
  package main
 
  import (
-	 "fmt"
- 	"time"
-     "bytes"
+	 "bytes"
 	 "encoding/json"
-	 "strconv"
+	 "fmt"
 	 "github.com/hyperledger/fabric/core/chaincode/shim"
 	 "github.com/hyperledger/fabric/protos/peer"
+	 "strconv"
+	 "time"
  )
 
 
@@ -101,11 +101,11 @@
   cw, _ := strconv.Atoi(args[1])
   cd, _ := strconv.ParseFloat(args[2], 64)
 
-  cargo:=CargoContract{Weight: cw, Distance: cd, Money: cm,
+  cargo:= CargoContract{Weight: cw, Distance: cd, Money: cm,
     Date: args[4], Registrant : args[5], Driver : args[6],Recipient:args[7], Status : args[8] }
     cargoAsBytes,_:=json.Marshal(cargo)
   if cargocontext == nil{
-        context:=CargoContext{Start:1,End:1}
+        context:= CargoContext{Start: 1,End:1}
         cargocontextAsBytes,_:=json.Marshal(context)
         stub.PutState(ckey,cargocontextAsBytes)
         key:="CARGO"+args[0]+"_1"

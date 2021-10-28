@@ -1,8 +1,8 @@
 package invokes
 
 import (
-	contract2 "cc-checker/ccs/normal/smart-audit-publish/src/core/contract"
-	rules2 "cc-checker/ccs/normal/smart-audit-publish/src/core/rules"
+	contract2 "cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/contract"
+	rules2 "cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/rules"
 	"fmt"
 	"log"
 	"strconv"

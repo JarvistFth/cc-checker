@@ -1,7 +1,7 @@
 package contract
 
 import (
-	contract2 "cc-checker/ccs/normal/smart-audit-publish/src/core/contract"
+	contract2 "cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/contract"
 	"errors"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"

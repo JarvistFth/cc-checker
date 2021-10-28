@@ -131,7 +131,7 @@ func (t *UserMng) DeleteUserinfo(stub shim.ChaincodeStubInterface, args []string
 
 	ValAsbytes, err := GetDocWithNamespace(stub, NS_USER_INFO, email) //get the UserInfo from chaincode state
 	if err != nil {
-		return ErrorPbResponse(RESP_CODE_SYSTEM_ERROR, "Failed to get doc for " + NS_USER_INFO + email + ":" + err.Error())
+		return ErrorPbResponse(RESP_CODE_SYSTEM_ERROR, "Failed to get doc for " +NS_USER_INFO+ email + ":" + err.Error())
 	} else if ValAsbytes == nil {
 		return ErrorPbResponse(RESP_CODE_DATA_NOT_EXISTED, "user_info does not exist: " + email + ":" + err.Error())
 	}
@@ -191,7 +191,7 @@ func (t *UserMng) ChangeUserInfo(stub shim.ChaincodeStubInterface, args []string
 		
 	ValAsbytes, err := GetDocWithNamespace(stub, NS_USER_INFO, email) //get the UserInfo from chaincode state
 	if err != nil {
-		return ErrorPbResponse(RESP_CODE_SYSTEM_ERROR, "Failed to get doc for " + NS_USER_INFO + email + ":" + err.Error())
+		return ErrorPbResponse(RESP_CODE_SYSTEM_ERROR, "Failed to get doc for " +NS_USER_INFO+ email + ":" + err.Error())
 	} else if ValAsbytes == nil {
 		return ErrorPbResponse(RESP_CODE_DATA_NOT_EXISTED, "user_info does not exist: " + email)
 	}

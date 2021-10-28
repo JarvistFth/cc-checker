@@ -2,11 +2,11 @@ package invokes
 
 import (
 	"bytes"
-	"cc-checker/ccs/normal/smart-audit-publish/src/core/common"
-	contract2 "cc-checker/ccs/normal/smart-audit-publish/src/core/contract"
-	project2 "cc-checker/ccs/normal/smart-audit-publish/src/core/project"
-	record2 "cc-checker/ccs/normal/smart-audit-publish/src/core/record"
-	"cc-checker/ccs/normal/smart-audit-publish/src/core/rules"
+	"cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/common"
+	contract2 "cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/contract"
+	project2 "cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/project"
+	record2 "cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/record"
+	"cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/rules"
 	"errors"
 	"fmt"
 	"log"

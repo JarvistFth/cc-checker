@@ -1,7 +1,7 @@
 package main
 
 import (
-	"cc-checker/core/dynamic"
+	"github.com/hyperledger/fabric/core/chaincode/shim"
 	"math/rand"
 	"testing"
 	"time"
@@ -20,24 +20,12 @@ func genUUID() string {
 func TestMockInvoke(t *testing.T) {
 	cc := new(SimpleAsset)
 
-	agent := dynamic.NewStubAgent ("cc",cc)
+	shim.NewMockStub("Cc",cc)
 
-	fn := "setWithRand"
-	args := []string{"aaa"}
+	//st.GetState()
 
-	b := dynamic.MockParams(fn,args)
-	//var strargs []string
-	//
-	//args := make([][]byte,len(strargs))
-	//
-	//for i:=0 ; i<len(strargs); i++{
-	//	args[i] = []byte(strargs[i])
-	//}
-	//
-	//stub.MockInit(genUUID(),args)
-	//
-	//stub.MockInvoke(genUUID(),args)
+	//st.MockInvoke("1",)
 
-	agent.MockInvoke("123",b)
+	//dynamic.CheckOtherRules(cc, "put",[]string{"1","2"})
 
 }

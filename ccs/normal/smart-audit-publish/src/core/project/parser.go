@@ -1,11 +1,11 @@
 package project
 
 import (
-	common2 "cc-checker/ccs/normal/smart-audit-publish/src/core/common"
-	"cc-checker/ccs/normal/smart-audit-publish/src/core/contract"
-	orgnization2 "cc-checker/ccs/normal/smart-audit-publish/src/core/orgnization"
-	"cc-checker/ccs/normal/smart-audit-publish/src/core/record"
-	"cc-checker/ccs/normal/smart-audit-publish/src/core/rules"
+	common2 "cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/common"
+	"cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/contract"
+	orgnization2 "cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/orgnization"
+	"cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/record"
+	"cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/rules"
 	"encoding/json"
 	"errors"
 	"fmt"

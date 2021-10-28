@@ -3,10 +3,10 @@
 
  import (
 	 "encoding/json"
-	 "strconv"
-   "fmt"
+	 "fmt"
 	 "github.com/hyperledger/fabric/core/chaincode/shim"
 	 "github.com/hyperledger/fabric/protos/peer"
+	 "strconv"
  )
 
 //peer chaincode query -n cargo-app -c '{"Args":["queryPoint", "USER.kim"]}' -C mychannel
@@ -67,7 +67,7 @@ func (t *SmartContract) createUser(stub shim.ChaincodeStubInterface, args []stri
 	}
 
 	key := args[0]
-	point := PointContract{Username:args[1],Total:0}
+	point := PointContract{Username: args[1],Total:0}
 
 	pointAsBytes, _ := json.Marshal(point)
 	stub.PutState(key, pointAsBytes)

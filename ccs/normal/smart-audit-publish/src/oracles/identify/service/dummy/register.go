@@ -1,6 +1,8 @@
 package dummy
 
-import "cc-checker/ccs/normal/smart-audit-publish/src/core/contract"
+import (
+	"cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/contract"
+)
 
 type EntityIdentifyRegistration struct {
 	dummyID uint32

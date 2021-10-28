@@ -1,8 +1,8 @@
 package main
 
 import (
-	invokes2 "cc-checker/ccs/normal/smart-audit-publish/src/core/invokes"
-	contract2 "cc-checker/ccs/normal/smart-audit-publish/src/fabric/contract"
+	invokes2 "cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/invokes"
+	contract2 "cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/fabric/contract"
 	"fmt"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	"github.com/hyperledger/fabric/protos/peer"

@@ -1,14 +1,14 @@
 package main
 
-import	(
-	"testing"
+import (
 	"fmt"
+	"testing"
 	// "bytes"
 	"encoding/json"
-	"strconv"
-	"reflect"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
-	)
+	"reflect"
+	"strconv"
+)
 
 func TestRegisterItem(t *testing.T) {
 	// ARRANGE

@@ -1,9 +1,9 @@
 package project
 
 import (
-	"cc-checker/ccs/normal/smart-audit-publish/src/core/common"
-	"cc-checker/ccs/normal/smart-audit-publish/src/core/orgnization"
-	"cc-checker/ccs/normal/smart-audit-publish/src/core/rules"
+	"cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/common"
+	"cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/orgnization"
+	"cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/rules"
 	"encoding/json"
 	"errors"
 )

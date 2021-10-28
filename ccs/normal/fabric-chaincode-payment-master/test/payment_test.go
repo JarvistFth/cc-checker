@@ -1,10 +1,10 @@
 package main_test
 
 import (
-	"github.com/c12msr/fabrictest/main"
-	"testing"
-	"github.com/hyperledger/fabric/core/chaincode/shim"
 	"fmt"
+	"github.com/c12msr/fabrictest/main"
+	"github.com/hyperledger/fabric/core/chaincode/shim"
+	"testing"
 )
 
 

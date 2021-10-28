@@ -2,8 +2,8 @@ package invokes
 
 import (
 	"bytes"
-	contract2 "cc-checker/ccs/normal/smart-audit-publish/src/core/contract"
-	orgnization2 "cc-checker/ccs/normal/smart-audit-publish/src/core/orgnization"
+	contract2 "cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/contract"
+	orgnization2 "cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/orgnization"
 	"fmt"
 	"log"
 	"strconv"

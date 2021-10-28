@@ -1,7 +1,7 @@
 package record
 
 import (
-	"cc-checker/ccs/normal/smart-audit-publish/src/core/contract"
+	"cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/contract"
 	"strconv"
 )
 

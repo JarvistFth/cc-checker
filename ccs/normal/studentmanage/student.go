@@ -1,7 +1,7 @@
 package main
 
 import (
-	"cc-checker/ccs/normal/studentmanage/utils"
+	"cc-checker/core/dynamic/ccs/normal/studentmanage/utils"
 	"encoding/json"
 	"fmt"
 	"github.com/hyperledger/fabric/core/chaincode/shim"

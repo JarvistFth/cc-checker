@@ -1,7 +1,7 @@
 package rules
 
 import (
-	contract2 "cc-checker/ccs/normal/smart-audit-publish/src/core/contract"
+	contract2 "cc-checker/core/dynamic/ccs/normal/smart-audit-publish/src/core/contract"
 	"encoding/json"
 	"errors"
 	"fmt"

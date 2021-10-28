@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
+	"strings"
 	"time"
-    "strings"
 )
 
 //time format const (

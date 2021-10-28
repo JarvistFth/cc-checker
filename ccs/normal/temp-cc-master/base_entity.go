@@ -1,7 +1,6 @@
 package main
 
 import (
-	. "github.com/deblk/temp-cc/constant"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 )
 
