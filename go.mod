@@ -14,8 +14,6 @@ require (
 	github.com/hyperledger/fabric-amcl v0.0.0-20200424173818-327c9e2cf77a // indirect
 	github.com/miekg/pkcs11 v1.0.3 // indirect
 	github.com/mitchellh/mapstructure v1.4.0 // indirect
-	github.com/onsi/ginkgo v1.14.2
-	github.com/onsi/gomega v1.10.4
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/spf13/viper v1.7.1 // indirect
 	github.com/sykesm/zap-logfmt v0.0.4 // indirect
@@ -24,13 +22,12 @@ require (
 	google.golang.org/grpc v1.34.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	sigs.k8s.io/yaml v1.2.0
+
 )
 
 require (
 	github.com/cloud9-tools/go-galoisfield v0.0.0-20160311182916-a8cf2bffadf0 // indirect
 	github.com/gonum/stat v0.0.0-20181125101827-41a0da705a5b // indirect
-	github.com/netkiller/chaincode v0.0.0-20210111085901-74f904cf7d90
-	github.com/nmatsui/fabric-payment-sample-chaincode v0.0.0-20180309055244-fa6a194dc6e6
 	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/satori/go.uuid v1.2.0

@@ -9,8 +9,16 @@ import (
 	"strings"
 )
 
+var ConflictMap map[string]string
+
+func init() {
+	ConflictMap = make(map[string]string)
+}
+
 type StubAgent struct {
 	 MockStub
+
+	 RWSet map[string]bool
 }
 
 func NewStubAgent(name string, cc shim.Chaincode) *StubAgent {
@@ -30,6 +38,9 @@ func NewStubAgent(name string, cc shim.Chaincode) *StubAgent {
 
 func (stub *StubAgent) GetState(key string) ([]byte, error) {
 	value := stub.State[key]
+	if _, ok := stub.RWSet[key]; ok{
+		log.Warning("invoke has Read-Your-Write error!!")
+	}
 	log.Debug("MockStub", stub.Name, "Getting", key, value)
 	fmt.Println("hello getstate!")
 	return value, nil
@@ -50,6 +61,17 @@ func (stub *StubAgent) PutState(key string, value []byte) error {
 
 	log.Debug("MockStub", stub.Name, "Putting", key, value)
 	stub.State[key] = value
+	stub.RWSet[key] = true
+
+	if val,ok := ConflictMap[key]; !ok{
+		ConflictMap[key] = string(value)
+	}else{
+		if val != string(value){
+			log.Warning("Non-Determined")
+		}
+	}
+
+
 
 	// insert key into ordered list of keys
 	for elem := stub.Keys.Front(); elem != nil; elem = elem.Next() {
@@ -92,8 +114,9 @@ func (stub *StubAgent) MockInit(uuid string, args [][]byte) pb.Response {
 	return res
 }
 
-func (stub StubAgent) InvokeChaincode(chaincodeName string, args [][]byte, channel string) pb.Response {
+func (stub *StubAgent) InvokeChaincode(chaincodeName string, args [][]byte, channel string) pb.Response {
 
+	log.Warning("call cross_channel_invoke!!")
 	if channel != "" {
 		chaincodeName = chaincodeName + "/" + channel
 	}

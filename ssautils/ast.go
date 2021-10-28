@@ -22,7 +22,7 @@ func checkAst(fset *token.FileSet, astfile *ast.File, pkg *types.Info) {
 
 
 					if id, ok := stmt.Lhs[pos].(*ast.Ident); ok && id.Name == "_"{
-						log.Warningf("unhandled error at %d", fset.Position(stmt.Pos()))
+						log.Warningf("unhandled error at %s", fset.Position(stmt.Pos()))
 					}
 				}
 			}
@@ -30,7 +30,7 @@ func checkAst(fset *token.FileSet, astfile *ast.File, pkg *types.Info) {
 			if callExpr, ok := stmt.X.(*ast.CallExpr); ok{
 				pos := returnsError(callExpr, pkg)
 				if pos >= 0{
-					log.Warningf("unhandled error at %d", fset.Position(stmt.Pos()))
+					log.Warningf("unhandled error at %s", fset.Position(stmt.Pos()))
 				}
 			}
 		}
