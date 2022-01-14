@@ -50,6 +50,9 @@ func (inv *FabSc) initfunMap() {
 // Init is called during chaincode instantiation to initialize any
 // data. Note that chaincode upgrade also calls this function to reset
 // or to migrate data.
+
+var logger = shim.NewLogger("raidneshcc")
+
 func (inv *FabSc) Init(stub shim.ChaincodeStubInterface) pb.Response {
 	logger.Infof("Init ChaininCode Fabsc")
 	inv.initfunMap()
@@ -89,4 +92,12 @@ func ChainCodeStatusCheck(stub shim.ChaincodeStubInterface, args []string) pb.Re
 	availabeByte, _ := json.Marshal(result)
 	logger.Debugf("ChaininCode  Running Status json data: %v", availabeByte)
 	return shim.Success(availabeByte)
+}
+
+func main() {
+	logger.SetLevel(shim.LogDebug)
+	err := shim.Start(new(FabSc))
+	if err != nil {
+		logger.Errorf("Error starting FabSc Smart Contract - %s", err)
+	}
 }

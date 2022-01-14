@@ -2,7 +2,9 @@ package static
 
 import (
 	"cc-checker/config"
+	"cc-checker/logger"
 	"cc-checker/ssautils"
+	"cc-checker/utils"
 	"flag"
 	"golang.org/x/tools/go/pointer"
 	"golang.org/x/tools/go/ssa"
@@ -20,6 +22,7 @@ var result *pointer.Result
 
 var outputResult map[string]bool
 
+var log = logger.GetLogger()
 
 func Main() {
 	var err error
@@ -43,28 +46,25 @@ func Main() {
 	} else {
 		log.Info(mainpkgs[0].String())
 	}
-	//_, invokef := utils.FindInvokeMethod(prog, mainpkgs[0])
+	_, invokef := utils.FindInvokeMethod(prog, mainpkgs[0])
 	//
-	//result = BuildCallGraph(mainpkgs,invokef)
-	//for v,p := range result.Queries{
-	//	log.Debugf("val: %s=%s, ptr:%s", v.Name(),v.String(), p.PointsTo().String())
-	//}
-	//if invokef != nil {
-	//	v := NewVisitor()
-	//	v.Visit(result.CallGraph.Nodes[invokef])
-	//
-	//	//for val,pt := range result.Queries{
-	//	//	log.Debugf("value: %s=%s, points to:%s", val.Name(),val.String(), pt.PointsTo().String())
-	//	//}
-	//	//nd := result.CallGraph.Nodes[invokef]
-	//	//for _, out := range nd.Out{
-	//	//	v := NewVisitor()
-	//	//	log.Infof("invoke out:%s", out.Callee.String())
-	//	//	v.Visit(out.Callee)
-	//	//}
-	//
-	//	v.handleSinkDetection()
-	//} else {
-	//	log.Infof("invoke func is nil\n")
-	//}
+	result = BuildCallGraph(mainpkgs,invokef)
+	if invokef != nil {
+		v := NewVisitor()
+		v.Visit(result.CallGraph.Nodes[invokef])
+
+		//for val,pt := range result.Queries{
+		//	log.Debugf("value: %s=%s, points to:%s", val.Name(),val.String(), pt.PointsTo().String())
+		//}
+		//nd := result.CallGraph.Nodes[invokef]
+		//for _, out := range nd.Out{
+		//	v := NewVisitor()
+		//	log.Infof("invoke out:%s", out.Callee.String())
+		//	v.Visit(out.Callee)
+		//}
+
+		v.handleSinkDetection()
+	} else {
+		log.Infof("invoke func is nil\n")
+	}
 }

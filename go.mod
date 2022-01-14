@@ -26,8 +26,8 @@ require (
 )
 
 require (
-	github.com/cloud9-tools/go-galoisfield v0.0.0-20160311182916-a8cf2bffadf0 // indirect
-	github.com/gonum/stat v0.0.0-20181125101827-41a0da705a5b // indirect
+	github.com/cloud9-tools/go-galoisfield v0.0.0-20160311182916-a8cf2bffadf0
+	github.com/gonum/stat v0.0.0-20181125101827-41a0da705a5b
 	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/satori/go.uuid v1.2.0

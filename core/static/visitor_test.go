@@ -53,7 +53,9 @@ func TestVisitor_Visit2(t *testing.T) {
 	}
 	log.Debug(cfg.String())
 	//prog, allpkgs, err = ssautils.BuildSSA("../ccs/hello/")
-	prog, allpkgs, err = ssautils.BuildSSA("../ccs/flow_sensitive/randomcc/")
+	//prog, allpkgs, err = ssautils.BuildSSA("../../ccs/normal/Fabric-Native-OS-v1.4-master")
+	//prog, allpkgs, err = ssautils.BuildSSA("../../ccs/normal/smart-audit-publish")
+	prog, allpkgs, err = ssautils.BuildSSA("../../ccs/flow_not_sensitive/timerandomcc")
 	mainpkgs, err := ssautils.MainPackages(allpkgs)
 	if err != nil {
 		t.Fatalf(err.Error())
@@ -66,9 +68,6 @@ func TestVisitor_Visit2(t *testing.T) {
 	_, invokef := utils.FindInvokeMethod(prog, mainpkgs[0])
 
 	result = BuildCallGraph(mainpkgs,invokef)
-	for v,p := range result.Queries{
-		log.Debugf("val: %s=%s, ptr:%s", v.Name(),v.String(), p.PointsTo().String())
-	}
 	if invokef != nil {
 		v := NewVisitor()
 		v.Visit(result.CallGraph.Nodes[invokef])

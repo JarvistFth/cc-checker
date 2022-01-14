@@ -40,26 +40,23 @@ func (m SinkCallArgsMap) Put(key ssa.CallInstruction, val ssa.Value) {
 	m[key][val] = true
 }
 
-type RwDetails struct {
-	Parents *ssa.Function
-	Key     ssa.Value
+
+type ReadAfterWriteMap map[*ssa.Function] string
+
+
+
+func (m ReadAfterWriteMap) Put(parent *ssa.Function, key string) {
+	m[parent] = key
+
 }
 
-type ReadAfterWriteMap map[ssa.CallInstruction]RwDetails
-
-
-
-func (m ReadAfterWriteMap) Put(c ssa.CallInstruction, rw RwDetails) {
-	m[c] = rw
+func (m ReadAfterWriteMap) Delete(parent *ssa.Function) {
+	delete(m, parent)
 }
 
-func (m ReadAfterWriteMap) Delete(c ssa.CallInstruction) {
-	delete(m, c)
-}
-
-func (m ReadAfterWriteMap) Contains(c ssa.CallInstruction) (rw RwDetails, ok bool) {
-	rw,ok = m[c]
-	return rw,ok
+func (m ReadAfterWriteMap) Contains(parent *ssa.Function) (key string, ok bool) {
+	key,ok = m[parent]
+	return key,ok
 }
 
 type LatticeTag struct {

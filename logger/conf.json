@@ -2,7 +2,7 @@
   "outputs": [{
       "output": "console",
       "level": "WARN",
-      "pattern": "[%{color:bold}%{level:.5s}] %{time:15:04:05} %{shortfile} - %{message}%{color:reset}"
+      "pattern": "[%{level:.5s}] %{time:15:04:05} %{shortfile} - %{message}"
   },
     {
       "output": "file",

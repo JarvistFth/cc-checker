@@ -212,6 +212,21 @@ func InStd(node *callgraph.Node) bool {
 	return pkg.Goroot
 }
 
+func IsInternalPkg(pkg *types.Package, mainPath string) bool {
+
+	pathStr := strings.FieldsFunc(mainPath, func(r rune) bool {
+		return string(r) == "/"
+	})
+
+	mainProjectName := pathStr[len(pathStr) - 1]
+
+	if strings.Contains(pkg.Path(),mainProjectName){
+		return true
+	}
+
+	return false
+
+}
 
 func IsStdPkg(pkg *types.Package) bool {
 	p, _ := build.Import(pkg.Path(), "", 0)

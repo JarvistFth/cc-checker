@@ -41,7 +41,7 @@ func (v *visitor) Visit(node *callgraph.Node) {
 
 	//check source
 	v.loopFunction(node)
-
+	v.rwMaps = map[*ssa.Function]string{}
 	for _, outputEdge := range node.Out {
 		if utils.IsSynthetic(outputEdge) || utils.InStd(outputEdge.Callee) || utils.InFabric(outputEdge.Callee) {
 			v.seen[outputEdge.Callee] = true
@@ -109,9 +109,9 @@ func (v *visitor) loopFunction(node *callgraph.Node) {
 
 			switch instr := i.(type) {
 			case *ssa.UnOp:
-				if _,ok := instr.X.(*ssa.Global); ok{
+				if g,ok := instr.X.(*ssa.Global); ok{
 					//log.Warningf("unop global variable here %s", prog.Fset.Position(i.Pos()))
-					v.taint(i,"use global variable")
+					v.taint(i,"use global variable " + g.Name() + " ")
 				}
 			case *ssa.FieldAddr:
 				addr := i.(ssa.Value)
@@ -181,29 +181,38 @@ func (v *visitor) checkSink(callInstr ssa.Instruction) {
 }
 
 func (v *visitor) checkReadAfterWrite(callInstr ssa.CallInstruction) {
-	if ok := config.IsCCRead(callInstr); ok{
-		log.Infof("chaincode reads stub here: %s, key:%s", prog.Fset.Position(callInstr.Pos()),callInstr.Common().Args[0].String())
 
-		if _,ok := v.rwMaps.Contains(callInstr); ok{
-			log.Warningf("read after write here:%s", prog.Fset.Position(callInstr.Pos()))
+	if ok := config.IsCCRead(callInstr); ok{
+		//todo: update read function as sink-check
+		keyName := callInstr.Common().Args[0].String()
+		log.Infof("chaincode reads stub here: %s, key:%s", prog.Fset.Position(callInstr.Pos()), keyName)
+		if key,ok := v.rwMaps.Contains(callInstr.Parent()); ok{
+			if key == keyName{
+				log.Warningf("read after write here:%s", prog.Fset.Position(callInstr.Pos()))
+			}
 			//os.Stdout.WriteString(fmt.Sprintf("read after write here:%s", prog.Fset.Position(callInstr.Pos())))
 		}
 	}
 
 	if ok := config.IsCCWrite(callInstr); ok{
-		log.Infof("chaincode writes stub here: %s, key:%s", prog.Fset.Position(callInstr.Pos()), callInstr.Common().Args[0].String())
-		v.rwMaps.Put(callInstr, common.RwDetails{
-			Parents: callInstr.Parent(),
-			Key:     callInstr.Common().Args[0],
-		})
+		refs := callInstr.Common().Args[0].Referrers()
+		if refs != nil{
+			for _, instr := range *refs{
+				log.Debugf("taint read after write:%s", instr.String())
+				v.taint(instr,"read after write")
+			}
+		}
+		keyName := callInstr.Common().Args[0].String()
+		log.Infof("chaincode writes stub here: %s, parent:%s, key:%s", prog.Fset.Position(callInstr.Pos()), callInstr.Parent(), keyName)
+		v.rwMaps.Put(callInstr.Parent(), keyName)
 	}
 }
 
 func (v *visitor) checkRangeQueryAndCrossChannel(callInstr ssa.CallInstruction) {
 	if ok := config.IsRangeQueryCall(callInstr); ok{
-		log.Warningf("range query photon reads here: %s, key:%s", prog.Fset.Position(callInstr.Pos()),callInstr.Common().Args[0].String())
+		//log.Warningf("range query photon reads here: %s, key:%s", prog.Fset.Position(callInstr.Pos()),callInstr.Common().Args[0].String())
 		//os.Stdout.WriteString(fmt.Sprintf("range query photon reads here: %s, key:%s", prog.Fset.Position(callInstr.Pos()),callInstr.Common().Args[0].String()))
-
+		v.taint(callInstr,"phantom reads")
 	}
 
 	if ok := config.IsCrossChannelCall(callInstr); ok{

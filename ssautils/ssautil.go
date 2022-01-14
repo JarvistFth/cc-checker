@@ -26,8 +26,13 @@ func BuildSSA(path string) (*ssa.Program, []*ssa.Package, error) {
 	}
 	prog, pkgs := ssautil.AllPackages(initial, 0)
 
-
-	checkAst(prog.Fset, initial[0].Syntax[0], initial[0].TypesInfo)
+	if len(initial) == 0 {
+		panic("no packages info!!")
+	}
+	if len(initial[0].Syntax) == 0{
+		panic("no ast-files info!!")
+	}
+	//checkAst(prog.Fset, initial[0].Syntax[0], initial[0].TypesInfo)
 
 	prog.Build()
 	//mainpkg, err := MainPackages(pkgs)
@@ -43,7 +48,7 @@ func BuildSSA(path string) (*ssa.Program, []*ssa.Package, error) {
 func MainPackages(pkgs []*ssa.Package) ([]*ssa.Package, error) {
 	var mains []*ssa.Package
 	for _, p := range pkgs {
-		if p != nil && p.Pkg.Name() == "main" && p.Func("main") != nil {
+		if p != nil && p.Pkg.Name() == "main" {
 			mains = append(mains, p)
 		}
 	}
@@ -53,8 +58,9 @@ func MainPackages(pkgs []*ssa.Package) ([]*ssa.Package, error) {
 
 	//check third-party pkg here
 	imports := mains[0].Pkg.Imports()
+	log.Debugf("main pkg path:%s", mains[0].Pkg.Path())
 	for _, imp := range imports{
-		if !utils.IsStdPkg(imp) && !utils.IsFabricPkg(imp){
+		if !utils.IsStdPkg(imp) && !utils.IsFabricPkg(imp) && !utils.IsInternalPkg(imp, mains[0].Pkg.Path()){
 			log.Warningf("chaincode use third-party pkg here: %s", imp.String())
 			//os.Stdout.WriteString("chaincode use third-party pkg here: "+imp.String()+"\n")
 

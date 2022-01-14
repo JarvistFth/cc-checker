@@ -45,12 +45,12 @@ func (t *SimpleAsset) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 
 	err := stub.PutState("key1",[]byte("1"))
 	val,err := stub.GetState("key1")
-
+	//val,err := get(stub,[]string{"key1"})
 	if err != nil{
 		return shim.Error("error")
 	}
 	// Return the result as success payload
-	return shim.Success(val)
+	return shim.Success([]byte(val))
 }
 
 // Set stores the asset (both key and value) on the ledger. If the key exists,

@@ -13,6 +13,8 @@ import (
 var Logger *logging.Logger
 var LogFile *os.File
 
+
+//      "pattern": "[%{color:bold}%{level:.5s}] %{time:15:04:05} %{shortfile} - %{message}%{color:reset}"
 type loggerConfig struct {
 	Outputs []struct {
 		Output  string `json:"output"`

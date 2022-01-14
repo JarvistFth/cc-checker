@@ -11,6 +11,7 @@ import (
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	"github.com/hyperledger/fabric/protos/peer"
 	"math/rand"
+	"time"
 )
 
 // SimpleAsset implements a simple chaincode to manage an asset
@@ -44,7 +45,7 @@ func (t *SimpleAsset) Init(stub shim.ChaincodeStubInterface) peer.Response {
 func (t *SimpleAsset) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 	// Extract the function and args from the transaction proposal
 
-
+	var ti time.Time
 	r := rand.Int()
 	fmt.Println(r)
 
@@ -53,6 +54,9 @@ func (t *SimpleAsset) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 		return shim.Error("error")
 		//return shim.Error("err")
 	}
+	ti = time.Now()
+	ti = time.UnixMicro(10)
+	stub.PutState("t1",[]byte(ti.String()))
 
 
 	// Return the result as success payload
