@@ -30,7 +30,7 @@ func Main() {
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
-	log.Debug(cfg.String())
+	//log.Debug(cfg.String())
 
 	ccsPath := flag.String("path","./","chaincode package path")
 	flag.Parse()

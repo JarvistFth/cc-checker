@@ -55,7 +55,6 @@ func (t *SimpleAsset) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 		//return shim.Error("err")
 	}
 	ti = time.Now()
-	ti = time.UnixMicro(10)
 	stub.PutState("t1",[]byte(ti.String()))
 
 

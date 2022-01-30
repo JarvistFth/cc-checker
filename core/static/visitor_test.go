@@ -70,19 +70,13 @@ func TestVisitor_Visit2(t *testing.T) {
 	result = BuildCallGraph(mainpkgs,invokef)
 	if invokef != nil {
 		v := NewVisitor()
+		tc := &utils.TimeCounter{}
+		tc.Begin()
 		v.Visit(result.CallGraph.Nodes[invokef])
 
-		//for val,pt := range result.Queries{
-		//	log.Debugf("value: %s=%s, points to:%s", val.Name(),val.String(), pt.PointsTo().String())
-		//}
-		//nd := result.CallGraph.Nodes[invokef]
-		//for _, out := range nd.Out{
-		//	v := NewVisitor()
-		//	log.Infof("invoke out:%s", out.Callee.String())
-		//	v.Visit(out.Callee)
-		//}
-
 		v.handleSinkDetection()
+		s,ms := tc.End()
+		log.Warningf("use total time: %f s, %f ms", s,ms)
 	} else {
 		log.Infof("invoke func is nil\n")
 	}

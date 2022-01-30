@@ -8,6 +8,7 @@ import (
 	"go/types"
 	"golang.org/x/tools/go/callgraph"
 	"golang.org/x/tools/go/ssa"
+	"sync"
 )
 
 
@@ -42,17 +43,35 @@ func (v *visitor) Visit(node *callgraph.Node) {
 	//check source
 	v.loopFunction(node)
 	v.rwMaps = map[*ssa.Function]string{}
+	var wg sync.WaitGroup
 	for _, outputEdge := range node.Out {
-		if utils.IsSynthetic(outputEdge) || utils.InStd(outputEdge.Callee) || utils.InFabric(outputEdge.Callee) {
-			v.seen[outputEdge.Callee] = true
-			continue
-		}
-		log.Infof("fn:%s -> out: %s", node.Func.Name(),outputEdge.Callee.String())
+		wg.Add(1)
+		go func(outputEdge *callgraph.Edge) {
+			defer wg.Done()
+			if utils.IsSynthetic(outputEdge) || utils.InStd(outputEdge.Callee) || utils.InFabric(outputEdge.Callee) {
+				v.seen[outputEdge.Callee] = true
+				return
+			}
+			log.Infof("fn:%s -> out: %s", node.Func.Name(),outputEdge.Callee.String())
 
-		//根据当前的taint的情况，设定函数入参的lattice情况
-		v.taintCallSigParams(outputEdge.Site)
-		v.Visit(outputEdge.Callee)
+			//根据当前的taint的情况，设定函数入参的lattice情况
+			v.taintCallSigParams(outputEdge.Site)
+			v.Visit(outputEdge.Callee)
+		}(outputEdge)
 	}
+
+	//for _, outputEdge := range node.Out {
+	//	if utils.IsSynthetic(outputEdge) || utils.InStd(outputEdge.Callee) || utils.InFabric(outputEdge.Callee) {
+	//		v.seen[outputEdge.Callee] = true
+	//		return
+	//	}
+	//	log.Infof("fn:%s -> out: %s", node.Func.Name(),outputEdge.Callee.String())
+	//
+	//	//根据当前的taint的情况，设定函数入参的lattice情况
+	//	v.taintCallSigParams(outputEdge.Site)
+	//	v.Visit(outputEdge.Callee)
+	//	//log.Warning("end visit here")
+	//}
 
 	//if !v.seen[node] {
 		//log.Infof("traverse visit: %s", node.String())

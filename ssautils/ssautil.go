@@ -8,11 +8,13 @@ import (
 	"golang.org/x/tools/go/packages"
 	"golang.org/x/tools/go/ssa"
 	"golang.org/x/tools/go/ssa/ssautil"
+	"time"
 )
 
 var log = logger.GetLogger()
 
 func BuildSSA(path string) (*ssa.Program, []*ssa.Package, error) {
+	startTime := time.Now().UnixNano()
 	ssacfg := &packages.Config{
 		Mode: packages.LoadAllSyntax,
 		Dir:  path,
@@ -29,9 +31,9 @@ func BuildSSA(path string) (*ssa.Program, []*ssa.Package, error) {
 	if len(initial) == 0 {
 		panic("no packages info!!")
 	}
-	if len(initial[0].Syntax) == 0{
-		panic("no ast-files info!!")
-	}
+	//if len(initial[0].Syntax) == 0{
+	//	panic("no ast-files info!!")
+	//}
 	//checkAst(prog.Fset, initial[0].Syntax[0], initial[0].TypesInfo)
 
 	prog.Build()
@@ -41,7 +43,11 @@ func BuildSSA(path string) (*ssa.Program, []*ssa.Package, error) {
 	//	log.Fatalf(err.Error())
 	//	return prog,nil,nil
 	//}
-
+	endTime := time.Now().UnixNano()
+	seconds := float64((endTime - startTime) / 1e9)
+	ms := float64((endTime - startTime) / 1e6)
+	log.Infof("build ssa use totaltime: %f s, %f ms",seconds, ms)
+	fmt.Printf("build ssa use totaltime: %f s, %f ms\n",seconds, ms)
 	return prog, pkgs, nil
 }
 
